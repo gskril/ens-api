@@ -1,4 +1,4 @@
-# ENS Metadata API
+# ENS Records API
 
 Request `/name.eth` or `/0x...` and the API will return the following ENS records:
 - description
