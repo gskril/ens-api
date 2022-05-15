@@ -21,6 +21,13 @@ app.get('/', (req, res) => {
 		to include the ENS avatar, but it will take a bit longer</p>`)
 })
 
+// Set CORS policy to allow all origins
+app.use((req, res, next) => {
+	res.header('Access-Control-Allow-Origin', '*')
+	res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
+	next()
+})
+
 app.get('/:address', async (req, res) => {
 	const startTime = Date.now()
 	let name = req.params.address
