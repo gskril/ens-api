@@ -14,6 +14,13 @@ app.listen(port, () => {
 	console.log(`Your application is running on port ${port}`)
 })
 
+app.get('/', (req, res) => {
+	res.send(`
+		<p>Request ENS records for a name like <a href="/nick.eth">nick.eth</a></p>
+		<p>Optionally append <a href="/nick.eth?avatar">'?avatar'</a> 
+		to include the ENS avatar, but it will take a bit longer</p>`)
+})
+
 app.get('/:address', async (req, res) => {
 	const startTime = Date.now()
 	let name = req.params.address
