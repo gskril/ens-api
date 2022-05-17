@@ -24,7 +24,10 @@ app.get('/', (req, res) => {
 // Set CORS policy to allow all origins
 app.use((req, res, next) => {
 	res.header('Access-Control-Allow-Origin', '*')
-	res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
+	res.header(
+		'Access-Control-Allow-Headers',
+		'Origin, X-Requested-With, Content-Type, Accept'
+	)
 	next()
 })
 
@@ -32,9 +35,12 @@ app.get('/:address', async (req, res) => {
 	const startTime = Date.now()
 	let name = req.params.address
 	const requestingAvatar = req.query.avatar !== undefined ? true : false
+	let address = name
 
 	if (ethers.utils.isAddress(name)) {
 		name = await provider.lookupAddress(name)
+	} else {
+		address = null
 	}
 
 	if (name === null || name === 'favicon.ico') {
@@ -51,6 +57,7 @@ app.get('/:address', async (req, res) => {
 
 	const records = {
 		name: name,
+		address: address ? address : await provider.resolveName(name),
 		description: await resolver.getText('description'),
 		avatar: requestingAvatar ? avatar.url : null,
 		url: await resolver.getText('url'),
@@ -64,8 +71,5 @@ app.get('/:address', async (req, res) => {
 	const duration = endTime - startTime
 
 	res.status(200)
-	res.json({
-		records: records,
-		time: duration,
-	})
+	res.json(records)
 })
