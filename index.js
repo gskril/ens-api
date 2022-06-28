@@ -1,10 +1,10 @@
 require('dotenv').config()
 const express = require('express')
+const cors = require('cors')
 const app = express()
 const port = process.env.PORT || 3000
 
 const ethers = require('ethers')
-
 const provider = new ethers.providers.InfuraProvider('homestead', {
 	projectId: process.env.INFURA_PROJECT_ID,
 	projectSecret: process.env.INFURA_PROJECT_SECRET,
@@ -25,14 +25,7 @@ app.get('/', (req, res) => {
 })
 
 // Set CORS policy to allow all origins
-app.use((req, res, next) => {
-	res.header('Access-Control-Allow-Origin', '*')
-	res.header(
-		'Access-Control-Allow-Headers',
-		'Origin, X-Requested-With, Content-Type, Accept'
-	)
-	next()
-})
+app.use(cors())
 
 app.get('/:address', async (req, res) => {
 	const startTime = Date.now()
@@ -74,7 +67,7 @@ app.get('/:address', async (req, res) => {
 		name: name,
 		address: address ? address : await provider.resolveName(name),
 		description: await resolver.getText('description'),
-		avatar: requestingAvatar ? avatar.url : null,
+		avatar: avatar?.url,
 		url: await resolver.getText('url'),
 		telegram: await resolver.getText('org.telegram'),
 		twitter: await resolver.getText('com.twitter'),
