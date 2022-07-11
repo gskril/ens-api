@@ -3,6 +3,7 @@ const express = require('express')
 const cors = require('cors')
 const app = express()
 const port = process.env.PORT || 3000
+const rateLimit = require('express-rate-limit')
 
 const ethers = require('ethers')
 const provider = new ethers.providers.InfuraProvider('homestead', {
@@ -13,6 +14,22 @@ const provider = new ethers.providers.InfuraProvider('homestead', {
 app.listen(port, () => {
 	console.log(`Your application is running on port ${port}`)
 })
+
+const limiter = rateLimit({
+	windowMs: 60 * 1000,
+	max: 30,
+	standardHeaders: true,
+	legacyHeaders: false,
+	message: {
+		error: 'Too many requests, try again in a minute',
+	},
+})
+
+// Rate limit the demo endpoint
+if (process.env.ENV == 'demo') {
+	console.log('Applying a rate limit')
+	app.use(limiter)
+}
 
 // Avoid Express always trying to request the favicon
 app.get('/favicon.ico', (req, res) => res.status(204).end())
