@@ -1,10 +1,7 @@
 import 'dotenv/config'
 import { ethers } from 'ethers'
 
-const provider = new ethers.providers.InfuraProvider('homestead', {
-  projectId: process.env.INFURA_PROJECT_ID,
-  projectSecret: process.env.INFURA_PROJECT_SECRET,
-})
+const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL || '')
 
 export default async function handler(req, res) {
   const { input } = req.query
