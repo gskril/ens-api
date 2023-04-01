@@ -2,12 +2,10 @@
   "name": "ens-records-api",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "dependencies": {
-    "cors": "^2.8.5",
     "dotenv": "^16.0.1",
-    "ethers": "^5.6.6",
-    "express": "^4.18.1",
-    "express-rate-limit": "^6.4.0"
+    "ethers": "^5.7.2"
   },
   "scripts": {
     "start": "node index"

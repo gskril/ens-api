@@ -3,8 +3,9 @@
 ⚠️ If you plan to use this in production, please [deploy your own endpoint](#deploy-your-own) (it's free until heavy traffic).
 
 Request `/name.eth` or `/0x...` and the API will return the following ENS records:
+
 - description
-- avatar (append `?avatar` query to URL)
+- avatar
 - url
 - telegram
 - twitter
@@ -12,8 +13,6 @@ Request `/name.eth` or `/0x...` and the API will return the following ENS record
 - email
 
 It works with ENS names and Ethereum addresses, but is slightly faster with ENS names.
-
-This is probably not the fastest way to fetch the records of an ENS name, but certainly the easiest that I've come across.
 
 ## Deploy your own
 
@@ -37,4 +36,5 @@ You will need [Node.js](https://nodejs.org/en/download/) and npm installed on yo
 
 1. Install dependencides with `npm install`
 2. Rename `.env.example` to `.env` and add your Infura project credentials
-3. Start the local server with `npm start`
+3. Install the [Vercel CLI](https://vercel.com/download)
+4. Start the local server with `vercel dev`
