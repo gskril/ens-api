@@ -25,13 +25,19 @@ export default async function handler(req, res) {
   }
 
   if (name === null) {
-    return res.status(404).send({ error: 'Address not found' })
+    if (address) {
+      return res
+        .status(404)
+        .json({ error: 'Primary name not found for this address' })
+    }
+
+    return res.status(404).json({ error: 'Address not found' })
   }
 
   const resolver = await provider.getResolver(name)
 
   if (resolver === null) {
-    return res.status(404).send({ error: 'Address not found' })
+    return res.status(404).json({ error: 'Address not found' })
   }
 
   const batch = await Promise.all([
