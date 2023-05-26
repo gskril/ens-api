@@ -54,6 +54,7 @@ async function getEnsProfile(addressOrName: string): Promise<EnsjsProfile> {
         fallback: {
           texts: fallbackRecords,
         },
+        skipGraph: false,
       }),
       timeoutPromise,
     ])) as EnsjsProfile
