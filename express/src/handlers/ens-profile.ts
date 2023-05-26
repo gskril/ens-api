@@ -6,8 +6,15 @@ import { JSDOM } from 'jsdom'
 
 import { cache, TTL } from '../cache.js'
 
-const avt = new AvatarResolver(provider)
 const window = new JSDOM().window
+const avt = new AvatarResolver(provider)
+const fallbackRecords = [
+  'avatar',
+  'com.github',
+  'com.twitter',
+  'description',
+  'url',
+]
 
 export async function getEnsProfile(req: Request, res: Response) {
   const { addressOrName } = req.params
@@ -19,12 +26,21 @@ export async function getEnsProfile(req: Request, res: Response) {
   }
 
   try {
-    const profile = await ENSInstance.getProfile(addressOrName, {
-      fallback: {
-        texts: ['avatar', 'com.github', 'com.twitter', 'description', 'url'],
-      },
-      skipGraph: true,
+    // timeout after 3 seconds
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => {
+        reject(new Error('Timeout'))
+      }, 3 * 1000)
     })
+
+    const profile = (await Promise.race([
+      ENSInstance.getProfile(addressOrName, {
+        fallback: {
+          texts: fallbackRecords,
+        },
+      }),
+      timeoutPromise,
+    ])) as EnsjsProfile
 
     if (!profile) {
       return res.status(404).json({
@@ -32,16 +48,46 @@ export async function getEnsProfile(req: Request, res: Response) {
       })
     }
 
-    // always return a name and address
-    if (!profile.name) profile.name = addressOrName
-    if (!profile.address) profile.address = addressOrName
-
-    const formattedProfile = await formatProfile(profile)
+    const formattedProfile = await formatProfile(profile, addressOrName)
 
     // cache the profile
     cache.set(buildCacheKey(addressOrName), formattedProfile, TTL)
     return res.status(200).json(formattedProfile)
   } catch (err: any) {
+    // ensjs has a fallabck that returns data even in some errors
+    if (err.data) {
+      // cache the profile
+      const formattedProfile = await formatProfile(err.data, addressOrName)
+      cache.set(buildCacheKey(addressOrName), formattedProfile, TTL)
+      return res.status(200).json(err.data)
+    }
+
+    // if The Graph times out, run the query again with fallback records
+    if (err.message === 'Timeout') {
+      try {
+        const profile = await ENSInstance.getProfile(addressOrName, {
+          fallback: {
+            texts: fallbackRecords,
+          },
+          skipGraph: true,
+        })
+
+        if (!profile) {
+          return res.status(404).json({
+            error: 'Profile not found',
+          })
+        }
+
+        const formattedProfile = await formatProfile(profile, addressOrName)
+
+        // cache the profile
+        cache.set(buildCacheKey(addressOrName), formattedProfile, TTL)
+        return res.status(200).json(formattedProfile)
+      } catch (err) {
+        return res.status(500).json(err)
+      }
+    }
+
     return res.status(500).json(err)
   }
 }
@@ -50,7 +96,13 @@ function buildCacheKey(addressOrName: string) {
   return `ens-profile-${addressOrName}`
 }
 
-async function formatProfile(profile: EnsjsProfile): Promise<FormattedProfile> {
+async function formatProfile(
+  profile: EnsjsProfile,
+  addressOrName: string
+): Promise<FormattedProfile> {
+  if (!profile.name) profile.name = addressOrName
+  if (!profile.address) profile.address = addressOrName
+
   const avatarRecord = profile.records?.texts?.find(
     (record) => record.key === 'avatar'
   )?.value
