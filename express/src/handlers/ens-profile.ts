@@ -15,7 +15,7 @@ const fallbackRecords = [
 
 export default async function handler(
   req: Request,
-  res: Response<FormattedProfile>
+  res: Response<FormattedProfile | { error: string }>
 ) {
   const { addressOrName } = req.params
 
@@ -31,9 +31,12 @@ export default async function handler(
   // if it's not cached, fetch it
   const profile = await getEnsProfile(addressOrName)
   const formattedProfile = await formatProfile(profile, addressOrName)
-
-  // cache the profile
   cache.set<FormattedProfile>(cacheKey, formattedProfile, TTL)
+
+  if (Object.keys(formattedProfile).length === 0) {
+    return res.status(404).json({ error: `Unable to resolve ${addressOrName}` })
+  }
+
   return res.status(200).json(formattedProfile)
 }
 
