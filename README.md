@@ -11,5 +11,5 @@ Vercel:
 Express:
 
 - Fetches all text records (makes a call to TheGraph first, which is why it's a bit slower)
-  - If you wanted to change this, just set `skipGraph` to `true` [here](https://github.com/gskril/ens-records-api/blob/main/express/src/handlers/ens-profile.ts#L56)
+  - If you wanted to change this, just set `skipGraph` to `true` [here](https://github.com/gskril/ens-records-api/blob/main/express/src/handlers/ens-profile.ts#L57)
 - Adds a `/batch` endpoint to reverse resolve a list of addresses
