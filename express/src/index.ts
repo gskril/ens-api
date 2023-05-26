@@ -1,8 +1,8 @@
 import 'dotenv/config'
 import express from 'express'
 
-import { getEnsProfile } from './handlers/ens-profile.js'
-import { batchResolve } from './handlers/batch-resolve.js'
+import handleEnsProfile from './handlers/ens-profile.js'
+import handleBatchResolve from './handlers/batch-resolve.js'
 
 const app = express()
 app.use(express.json())
@@ -19,5 +19,5 @@ app.use(function (req, res, next) {
   next()
 })
 
-app.get('/:addressOrName', getEnsProfile)
-app.post('/batch', batchResolve)
+app.get('/:addressOrName', handleEnsProfile)
+app.post('/batch', handleBatchResolve)

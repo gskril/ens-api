@@ -4,7 +4,7 @@ import { ens_normalize as normalize } from '@adraffy/ens-normalize'
 import { ENSInstance } from '../provider.js'
 import { TTL, cache } from '../cache.js'
 
-export async function batchResolve(req: Request, res: Response) {
+export default async function handler(req: Request, res: Response) {
   const addresses = req.body.addresses as string[] | undefined
 
   if (!addresses || !Array.isArray(addresses)) {
