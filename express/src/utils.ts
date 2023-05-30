@@ -9,11 +9,12 @@ const matcherIpfs = new RegExp('^(ipfs)://(.*)$', 'i')
 const zeroAddress = '0x0000000000000000000000000000000000000000'
 
 export async function formatProfile(
-  profile: EnsjsProfile,
+  profile: EnsjsProfile | undefined,
   addressOrName: string
 ): Promise<FormattedProfile> {
   // Return empty object if no profile
   if (
+    !profile ||
     profile.resolverAddress === zeroAddress ||
     profile.message === "Name doesn't have a resolver"
   ) {
