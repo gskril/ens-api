@@ -6,8 +6,9 @@
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf ./dist",
+    "dev": "tsc && node --experimental-specifier-resolution=node ./dist/index --dev",
     "start": "tsc && node --experimental-specifier-resolution=node ./dist/index",
-    "dev": "tsc && node --experimental-specifier-resolution=node ./dist/index.js --dev"
+    "test": "tsc && node --experimental-specifier-resolution=node ./dist/tests/test"
   },
   "type": "module",
   "dependencies": {

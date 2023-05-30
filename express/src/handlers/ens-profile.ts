@@ -40,7 +40,9 @@ export default async function handler(
   return res.status(200).json(formattedProfile)
 }
 
-async function getEnsProfile(addressOrName: string): Promise<EnsjsProfile> {
+export async function getEnsProfile(
+  addressOrName: string
+): Promise<EnsjsProfile> {
   try {
     // timeout after 3 seconds (usually caused by The Graph downtime)
     const timeoutPromise = new Promise((_, reject) => {
