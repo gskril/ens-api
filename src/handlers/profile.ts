@@ -1,8 +1,9 @@
-import { IRequest } from 'itty-router';
 import { createPublicClient, http } from 'viem';
+import { IRequest } from 'itty-router';
 import { mainnet } from 'viem/chains';
 import zod from 'zod';
-import { getEnsProfile } from '../functions/ens';
+
+import { getEnsProfile } from '../functions/profile';
 
 const commaSeparatedListSchema = (type: 'string' | 'number') => {
 	return zod.string().refine((value) => {
