@@ -1,5 +1,5 @@
 {
-	"name": "ens-worker-api",
+	"name": "ens-api",
 	"version": "0.0.0",
 	"private": true,
 	"scripts": {
