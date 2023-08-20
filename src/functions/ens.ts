@@ -77,7 +77,7 @@ export async function getEnsProfile({
 		if (addressKeys) {
 			// Take `addressKeys.length` from the front of the array
 			addresses = res
-				.slice(0, addressKeys.length)
+				.splice(0, addressKeys.length)
 				.reduce((acc: AddressRecord, curr, index) => {
 					const key = addressKeys[index];
 					acc[key] = curr;
