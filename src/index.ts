@@ -1,14 +1,13 @@
 import { createCors, error, Router } from 'itty-router';
-import handleName from './handlers/name';
-import handleAddress from './handlers/address';
+
+import handleProfile from './handlers/profile';
 
 const router = Router();
 const { preflight, corsify } = createCors();
 
 router
 	.all('*', preflight)
-	.get('/a/:address', (request, env) => handleAddress(request, env))
-	.get('/n/:name', (request, env) => handleName(request, env))
+	.get('/profile/:addressOrName', (request, env) => handleProfile(request, env))
 	.all('*', () => error(404));
 
 export default {
