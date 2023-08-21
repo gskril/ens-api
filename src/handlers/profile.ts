@@ -51,7 +51,9 @@ export default async function handler(request: IRequest, env: Env): Promise<Resp
 		transport: http(env.ETH_RPC),
 		chain: mainnet,
 		batch: {
-			multicall: true,
+			multicall: {
+				batchSize: 5_120,
+			},
 		},
 	});
 

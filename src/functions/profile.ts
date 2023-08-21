@@ -37,15 +37,13 @@ export async function getEnsProfile({
 		return { data: undefined, status: 400 };
 	}
 
-	// If the input is an address, try to resolve a name
+	// If the input is an address, try to resolve a name (we always need to start with a name)
 	const name = inputIsAddress
 		? await client.getEnsName({ address: addressOrName as Address })
-		: normalize(addressOrName);
-
-	// If the input is a name, try to resolve an address
-	const address = inputIsName
-		? await client.getEnsAddress({ name: normalize(addressOrName) })
 		: addressOrName;
+
+	// If the input is a name, push the address into the batch call below
+	let address = inputIsName ? null : addressOrName;
 
 	let addresses: EnsProfile['addresses'] = undefined;
 	let texts: EnsProfile['texts'] = undefined;
@@ -53,12 +51,16 @@ export async function getEnsProfile({
 
 	if (name) {
 		// These will be batched into a single multicall
-		const asyncCalls = [client.getEnsAvatar({ name })];
+		const asyncCalls = [client.getEnsAvatar({ name: normalize(name) })];
+
+		if (!address) {
+			asyncCalls.push(client.getEnsAddress({ name: normalize(name) }));
+		}
 
 		if (addressKeys) {
 			asyncCalls.push(
 				...addressKeys.map((key) => {
-					return client.getEnsAddress({ name: name, coinType: Number(key) });
+					return client.getEnsAddress({ name: normalize(name), coinType: Number(key) });
 				})
 			);
 		}
@@ -66,13 +68,16 @@ export async function getEnsProfile({
 		if (textKeys) {
 			asyncCalls.push(
 				...textKeys.map((key) => {
-					return client.getEnsText({ name: name, key });
+					return client.getEnsText({ name: normalize(name), key });
 				})
 			);
 		}
 
+		// Response is ordered by avatar, ETH address (as needed), address values (if requested), text values (if requested)
 		const res = await Promise.all(asyncCalls);
+
 		avatar = res.shift() || null;
+		address = address || res.shift() || null;
 
 		if (addressKeys) {
 			// Take `addressKeys.length` from the front of the array
