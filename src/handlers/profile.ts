@@ -17,7 +17,9 @@ const commaSeparatedListSchema = (type: 'string' | 'number') => {
 	});
 };
 
-const addressOrNameSchema = zod.object({ addressOrName: zod.string() });
+const addressOrNameSchema = zod.object({
+	addressOrName: zod.string().includes('.').or(zod.string().startsWith('0x').length(42)),
+});
 
 const keySchema = zod.object({
 	texts: commaSeparatedListSchema('string').optional(),
