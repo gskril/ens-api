@@ -9,9 +9,7 @@ const { preflight, corsify } = createCors();
 
 router
 	.all('*', preflight)
-	.get('/', async () => {
-		return Response.json(indexJson);
-	})
+	.get('/', () => Response.json(indexJson))
 	.get('/profile/:addressOrName', (request, env) => handleProfile(request, env))
 	.post('/batch/addresses', (request, env) => handleBatchAddresses(request, env))
 	.post('/batch/names', (request, env) => handleBatchNames(request, env))
