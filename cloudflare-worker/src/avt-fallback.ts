@@ -13,8 +13,8 @@ const avatar = `
 
 // return 404 status but still send the fallback avatar
 export function fallbackResponse() {
-	return new Response(avatar, {
-		status: 404,
-		headers: { 'Content-Type': 'image/svg+xml' },
-	});
+  return new Response(avatar, {
+    status: 404,
+    headers: { 'Content-Type': 'image/svg+xml' },
+  });
 }

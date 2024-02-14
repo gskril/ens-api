@@ -1,3 +1,3 @@
 interface Env {
-	ETH_RPC?: string;
+  ETH_RPC?: string;
 }
