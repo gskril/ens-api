@@ -1,9 +1,9 @@
-import { createPublicClient, http } from 'viem';
 import { IRequest } from 'itty-router';
-import { mainnet } from 'viem/chains';
+import { normalize } from 'viem/ens';
+import { PublicClient } from 'viem';
 import zod from 'zod';
 
-import { getAddressesFromNames } from '../../functions/batch/names';
+import { getPublicClient } from '../../utils';
 
 const schema = zod.object({
 	names: zod
@@ -24,17 +24,30 @@ export default async function handler(request: IRequest, env: Env): Promise<Resp
 	}
 
 	const { names } = safeSchema.data;
-
-	const client = createPublicClient({
-		transport: http(env.ETH_RPC),
-		chain: mainnet,
-		batch: {
-			multicall: {
-				batchSize: 10_240,
-			},
-		},
-	});
+	const client = getPublicClient(env);
 
 	const addresses = await getAddressesFromNames(client, names);
 	return Response.json(addresses, { status: 200 });
+}
+
+async function getAddressesFromNames(client: PublicClient, names: string[]) {
+	const normalizedNames = names.map((name) => {
+		try {
+			return normalize(name);
+		} catch (error) {
+			return null;
+		}
+	});
+
+	// These will be batched into a single multicall
+	const asyncCalls = normalizedNames.map((name) => {
+		if (!name) {
+			return null;
+		}
+
+		return client.getEnsAddress({ name });
+	});
+
+	const addresses = await Promise.all(asyncCalls);
+	return addresses;
 }

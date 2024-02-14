@@ -16,19 +16,12 @@ router
 	.all('*', () => error(404));
 
 export default {
-	async fetch(request: Request, env: Env, _ctx: ExecutionContext): Promise<Response> {
-		return router
-			.handle(request, env)
-			.then(corsify)
-			.catch((err) => {
-				return new Response(err, { status: 500 });
-			});
+	async fetch(request: Request, env: Env): Promise<Response> {
+		return router.handle(request, env).then(corsify).catch(error);
 	},
 };
 
 const indexJson = {
-	message: 'This is open source, feel free to fork it and run your own!',
-	repository: 'https://github.com/gskril/ens-records-api',
 	endpoints: [
 		{
 			method: 'GET',

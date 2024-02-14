@@ -4,6 +4,7 @@ import { mainnet } from 'viem/chains';
 import zod from 'zod';
 
 import { getEnsProfile } from '../functions/profile';
+import { getPublicClient } from '../utils';
 
 const commaSeparatedListSchema = (type: 'string' | 'number') => {
 	return zod.string().refine((value) => {
@@ -48,16 +49,7 @@ export default async function handler(request: IRequest, env: Env): Promise<Resp
 		addressKeys: addresses?.split(',').map((key) => key.trim()),
 	};
 
-	// Create a client to the Ethereum RPC
-	const client = createPublicClient({
-		transport: http(env.ETH_RPC),
-		chain: mainnet,
-		batch: {
-			multicall: {
-				batchSize: 5_120,
-			},
-		},
-	});
+	const client = getPublicClient(env);
 
 	const { data: profile, status } = await getEnsProfile({
 		client,
