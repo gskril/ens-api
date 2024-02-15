@@ -1,8 +1,8 @@
 import { IRequest } from 'itty-router';
 import { z } from 'zod';
 
-import { fallbackResponse } from '../avt-fallback';
-import { getPublicClient } from '../utils';
+import { fallbackResponse } from '../lib/avt-fallback';
+import { getPublicClient } from '../lib/utils';
 
 const schema = z.object({
   name: z.string(),
@@ -10,7 +10,7 @@ const schema = z.object({
   height: z.coerce.number().default(256).optional(),
 });
 
-export async function handleTransform(request: IRequest, env: Env) {
+export async function handleAvatar(request: IRequest, env: Env) {
   const params = { ...request.params, ...request.query };
   const safeParse = schema.safeParse(params);
 

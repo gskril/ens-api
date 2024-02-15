@@ -1,3 +1,7 @@
 name = "ens-api"
 main = "src/index.ts"
 compatibility_date = "2023-08-14"
+
+# The necessary secrets are:
+# - ETH_RPC
+# Run `echo <VALUE> | npx wrangler secret put <NAME>` for each of these

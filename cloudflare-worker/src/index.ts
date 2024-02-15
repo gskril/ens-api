@@ -1,8 +1,10 @@
 import { createCors, error, Router } from 'itty-router';
 
-import handleProfile from './handlers/profile';
 import handleBatchAddresses from './handlers/batch/addresses';
 import handleBatchNames from './handlers/batch/names';
+import { handleName } from './handlers/name';
+import { handleAddress } from './handlers/address';
+import { handleAvatar } from './handlers/avatar';
 
 const router = Router();
 const { preflight, corsify } = createCors();
@@ -10,7 +12,9 @@ const { preflight, corsify } = createCors();
 router
   .all('*', preflight)
   .get('/', () => Response.json(indexJson))
-  .get('/profile/:addressOrName', (request, env) => handleProfile(request, env))
+  .get('/n/:name', (request, env) => handleName(request, env))
+  .get('/a/:address', (request, env) => handleAddress(request, env))
+  .get('/avatar/:name', (request, env) => handleAvatar(request, env))
   .post('/batch/addresses', (request, env) => handleBatchAddresses(request, env))
   .post('/batch/names', (request, env) => handleBatchNames(request, env))
   .all('*', () => error(404));
@@ -25,20 +29,27 @@ const indexJson = {
   endpoints: [
     {
       method: 'GET',
-      endpoint: '/profile/:addressOrName',
-      description: 'Returns ENS profile for a name or ETH address',
-      params: ['texts', 'addresses'],
+      endpoint: '/n/:name',
+      params: ['texts', 'coins'],
+    },
+    {
+      method: 'GET',
+      endpoint: '/a/:address',
+      params: ['texts', 'coins'],
+    },
+    {
+      method: 'GET',
+      endpoint: '/avatar/:name',
+      params: ['width', 'height'],
     },
     {
       method: 'POST',
       endpoint: '/batch/addresses',
-      description: 'Returns ENS names for a list of ETH addresses',
       body: ['addresses'],
     },
     {
       method: 'POST',
       endpoint: '/batch/names',
-      description: 'Returns ETH addresses for a list of ENS names',
       body: ['names'],
     },
   ],

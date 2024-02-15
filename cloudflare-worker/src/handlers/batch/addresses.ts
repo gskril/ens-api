@@ -3,7 +3,7 @@ import { IRequest } from 'itty-router';
 import { normalize } from 'viem/ens';
 import zod from 'zod';
 
-import { getPublicClient } from '../../utils';
+import { getPublicClient } from '../../lib/utils';
 
 const schema = zod.object({
   addresses: zod.array(zod.string().regex(/^0x[a-fA-F0-9]{40}$/)).max(100),

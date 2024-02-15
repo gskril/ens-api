@@ -3,7 +3,7 @@ import { normalize } from 'viem/ens';
 import { PublicClient } from 'viem';
 import zod from 'zod';
 
-import { getPublicClient } from '../../utils';
+import { getPublicClient } from '../../lib/utils';
 
 const schema = zod.object({
   names: zod
