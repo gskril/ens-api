@@ -19,7 +19,7 @@ export async function handleAddress(request: IRequest, env: Env) {
   const safeParse = schema.safeParse({ ...request.params, ...request.query });
 
   if (!safeParse.success) {
-    return new Response('Invalid request', { status: 400 });
+    return Response.json(safeParse.error, { status: 400 });
   }
 
   const params = safeParse.data;

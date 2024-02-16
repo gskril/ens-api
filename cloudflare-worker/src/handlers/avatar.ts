@@ -15,7 +15,7 @@ export async function handleAvatar(request: IRequest, env: Env) {
   const safeParse = schema.safeParse(params);
 
   if (!safeParse.success) {
-    return new Response('Invalid request', { status: 400 });
+    return Response.json(safeParse.error, { status: 400 });
   }
 
   const { name, width, height } = safeParse.data;
