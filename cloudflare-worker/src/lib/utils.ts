@@ -3,6 +3,8 @@ import { createPublicClient, http } from 'viem';
 import { mainnet } from 'viem/chains';
 import { z } from 'zod';
 
+import { defaultCoinKeys, defaultTextKeys } from './constants';
+
 export function getPublicClient(env: Env) {
   return createPublicClient({
     transport: http(env.ETH_RPC),
@@ -26,3 +28,19 @@ export const commaSeparatedListSchema = (type: 'string' | 'number') => {
     }
   });
 };
+
+export function parseKeysFromParams({
+  texts,
+  coins,
+}: {
+  texts?: string | undefined;
+  coins?: string | undefined;
+}) {
+  const requestedTextKeys = texts?.split(',').map((key) => key.trim()) || [];
+  const requestedCoinKeys = coins?.split(',').map((key) => Number(key)) || [];
+
+  const textKeys = defaultTextKeys.concat(requestedTextKeys);
+  const coinKeys = defaultCoinKeys.concat(requestedCoinKeys);
+
+  return { textKeys, coinKeys };
+}
