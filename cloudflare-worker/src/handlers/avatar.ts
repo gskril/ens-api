@@ -6,8 +6,8 @@ import { getPublicClient } from '../lib/utils';
 
 const schema = z.object({
   name: z.string(),
-  width: z.coerce.number().default(256).optional(),
-  height: z.coerce.number().default(256).optional(),
+  width: z.coerce.number().optional().default(256),
+  height: z.coerce.number().optional().default(256),
 });
 
 export async function handleAvatar(request: IRequest, env: Env) {

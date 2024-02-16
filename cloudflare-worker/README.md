@@ -1,10 +1,65 @@
 # ENS API
 
-## Avatar Transformer
+Cloudflare Worker that provides a simple API for fetching ENS profiles and avatars.
 
-This is a Cloudflare Worker that transforms and caches ENS avatars to be safe and performant for use in web applications.
+## Endpoints:
 
-In order to host this API, you will need to configure Cloudflare in a few ways:
+- GET `/n/:name` - Fetch a profile for an ENS name
+  - Params (all optional):
+    - `texts` - keys of text records to fetch (comma-separated)
+    - `coins` - coin types to fetch (comma-separated)
+- GET `/a/:address` - Fetch a profile for an Ethereum address, if it has a primary ENS name
+  - Params (all optional):
+    - `texts` - keys of text records to fetch (comma-separated)
+    - `coins` - coin types to fetch (comma-separated)
+- GET `/avatar/:name` - Fetch an avatar for an ENS name
+  - Params (all optional):
+    - `width` - width of the avatar (default: 256)
+    - `height` - height of the avatar (default: 256)
+- POST `/batch/names` - Resolve a list of addresses from ENS names
+  - Body:
+    - `names` - array of ENS names
+    - `coinType` (optional) - coin type to resolve (default: 60)
+- POST `/batch/addresses` - Resolve a list of ENS names from ETH addresses
+  - Body:
+    - `addresses` - array of ETH addresses
+
+## How to deploy:
+
+Clone this repo
+
+```bash
+git clone https://github.com/gskril/ens-api.git
+```
+
+Navigate to the `cloudflare-worker` directory and install dependencies
+
+```bash
+cd cloudflare-worker
+yarn install
+```
+
+Login to Cloudflare
+
+```bash
+npx wrangler login
+```
+
+Deploy the Worker
+
+```bash
+yarn run deploy
+```
+
+Set your environment variable
+
+```bash
+echo <VALUE> | npx wrangler secret put ETH_RPC
+```
+
+## Cloudflare configuration
+
+In order to enable avatar transformations, you will need to configure Cloudflare in a few ways:
 
 - Under "Images" > "Transformations", navigate to the zone you want to use and enable transformations.
 - Deploy this Worker to your Cloudflare account and set the environment variables as described in [`wrangler.tom`](./wrangler.toml).
