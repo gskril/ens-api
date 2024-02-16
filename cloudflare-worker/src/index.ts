@@ -1,10 +1,10 @@
 import { createCors, error, Router } from 'itty-router';
 
-import handleBatchAddresses from './handlers/batch/addresses';
-import handleBatchNames from './handlers/batch/names';
-import { handleName } from './handlers/name';
 import { handleAddress } from './handlers/address';
+import { handleAddresses } from './handlers/batch/addresses';
 import { handleAvatar } from './handlers/avatar';
+import { handleName } from './handlers/name';
+import { handleNames } from './handlers/batch/names';
 
 const router = Router();
 const { preflight, corsify } = createCors();
@@ -15,8 +15,8 @@ router
   .get('/n/:name', (request, env) => handleName(request, env))
   .get('/a/:address', (request, env) => handleAddress(request, env))
   .get('/avatar/:name', (request, env) => handleAvatar(request, env))
-  .post('/batch/addresses', (request, env) => handleBatchAddresses(request, env))
-  .post('/batch/names', (request, env) => handleBatchNames(request, env))
+  .post('/batch/addresses', (request, env) => handleAddresses(request, env))
+  .post('/batch/names', (request, env) => handleNames(request, env))
   .all('*', () => error(404));
 
 export default {

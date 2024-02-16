@@ -1,21 +1,22 @@
 import { IRequest } from 'itty-router';
 import { normalize } from 'viem/ens';
-import { PublicClient } from 'viem';
-import zod from 'zod';
+import { z } from 'zod';
 
 import { getPublicClient } from '../../lib/utils';
+import { batch, getAddressRecord } from '@ensdomains/ensjs/public';
 
-const schema = zod.object({
-  names: zod
+const schema = z.object({
+  names: z
     .array(
-      zod.string().refine((name) => name.includes('.'), {
+      z.string().refine((name) => name.includes('.'), {
         message: 'Name must include a "."',
       })
     )
     .max(100),
+  coinType: z.number().optional().default(60),
 });
 
-export default async function handler(request: IRequest, env: Env): Promise<Response> {
+export async function handleNames(request: IRequest, env: Env) {
   const body = await request.json().catch(() => ({}));
   const safeSchema = schema.safeParse(body);
 
@@ -23,31 +24,24 @@ export default async function handler(request: IRequest, env: Env): Promise<Resp
     return Response.json(safeSchema.error, { status: 400 });
   }
 
-  const { names } = safeSchema.data;
+  const { names, coinType } = safeSchema.data;
   const client = getPublicClient(env);
 
-  const addresses = await getAddressesFromNames(client, names);
-  return Response.json(addresses, { status: 200 });
-}
+  console.log(coinType);
 
-async function getAddressesFromNames(client: PublicClient, names: string[]) {
   const normalizedNames = names.map((name) => {
     try {
       return normalize(name);
-    } catch (error) {
-      return null;
+    } catch {
+      return '';
     }
   });
 
-  // These will be batched into a single multicall
-  const asyncCalls = normalizedNames.map((name) => {
-    if (!name) {
-      return null;
-    }
+  const res = await batch(
+    client,
+    ...normalizedNames.map((name) => getAddressRecord.batch({ name, coin: coinType }))
+  );
 
-    return client.getEnsAddress({ name });
-  });
-
-  const addresses = await Promise.all(asyncCalls);
-  return addresses;
+  const addresses = res.map((obj) => obj?.value || null);
+  return Response.json(addresses);
 }
