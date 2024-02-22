@@ -50,7 +50,7 @@ const indexJson = {
     {
       method: 'POST',
       endpoint: '/batch/names',
-      body: ['names'],
+      body: ['names', 'coinType'],
     },
   ],
 };
