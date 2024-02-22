@@ -6,8 +6,8 @@ import { getPublicClient } from '../lib/utils';
 
 const schema = z.object({
   name: z.string(),
-  width: z.coerce.number().optional().default(256),
-  height: z.coerce.number().optional().default(256),
+  width: z.coerce.number().optional(),
+  height: z.coerce.number().optional(),
 });
 
 export async function handleAvatar(request: IRequest, env: Env) {
@@ -32,8 +32,8 @@ export async function handleAvatar(request: IRequest, env: Env) {
     cf: {
       cacheTtl: 3600,
       image: {
-        width,
-        height,
+        width: width || height || 256,
+        height: height || width || 256,
         fit: 'cover',
       },
     },
