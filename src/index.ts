@@ -12,11 +12,11 @@ const { preflight, corsify } = createCors();
 router
   .all('*', preflight)
   .get('/', () => Response.json(indexJson))
-  .get('/n/:name', (request, env, ctx) => handleName(request, env, ctx))
-  .get('/a/:address', (request, env, ctx) => handleAddress(request, env, ctx))
-  .get('/avatar/:name', (request, env, ctx) => handleAvatar(request, env, ctx))
-  .post('/batch/addresses', (request, env, ctx) => handleAddresses(request, env, ctx))
-  .post('/batch/names', (request, env, ctx) => handleNames(request, env, ctx))
+  .get('/name/:name', handleName)
+  .get('/address/:address', handleAddress)
+  .get('/avatar/:name', handleAvatar)
+  .post('/batch/addresses', handleAddresses)
+  .post('/batch/names', handleNames)
   .all('*', () => error(404));
 
 export default {
@@ -29,12 +29,12 @@ const indexJson = {
   endpoints: [
     {
       method: 'GET',
-      endpoint: '/n/:name',
+      endpoint: '/name/:name',
       params: ['texts', 'coins'],
     },
     {
       method: 'GET',
-      endpoint: '/a/:address',
+      endpoint: '/address/:address',
       params: ['texts', 'coins'],
     },
     {

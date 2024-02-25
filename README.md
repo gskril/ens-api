@@ -9,11 +9,11 @@ By default, all endpoints are cached for 10 minutes, then serve a stale response
 
 ## Endpoints:
 
-- GET `/n/:name` - Fetch a profile for an ENS name
+- GET `/name/:name` - Fetch a profile for an ENS name
   - Params (all optional):
     - `texts` - keys of text records to fetch (comma-separated)
     - `coins` - coin types to fetch (comma-separated)
-- GET `/a/:address` - Fetch a profile for an Ethereum address, if it has a primary ENS name
+- GET `/address/:address` - Fetch a profile for an Ethereum address, if it has a primary ENS name
   - Params (all optional):
     - `texts` - keys of text records to fetch (comma-separated)
     - `coins` - coin types to fetch (comma-separated)
@@ -25,7 +25,7 @@ By default, all endpoints are cached for 10 minutes, then serve a stale response
   - Body:
     - `names` - array of ENS names
     - `coinType` (optional) - coin type to resolve (default: 60)
-- POST `/batch/addresses` - Resolve a list of ENS names from ETH addresses
+- POST `/batch/addresses` - Resolve a list of primary ENS names from ETH addresses
   - Body:
     - `addresses` - array of ETH addresses
 
