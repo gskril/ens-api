@@ -33,6 +33,8 @@ export async function handleAvatar(request: IRequest, env: Env, ctx: ExecutionCo
     return fallbackResponse(ctx, cache, cacheKey);
   }
 
+  // Note: Cloudflare sanitizes SVGs by default so we don't need extra checks here
+  // https://developers.cloudflare.com/images/transform-images/#sanitized-svgs
   const res = await fetch(ensAvatar, {
     headers: request.headers,
     cf: {
