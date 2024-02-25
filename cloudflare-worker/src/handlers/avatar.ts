@@ -30,7 +30,7 @@ export async function handleAvatar(request: IRequest, env: Env, ctx: ExecutionCo
   const ensAvatar = await client.getEnsAvatar({ name });
 
   if (!ensAvatar) {
-    return fallbackResponse();
+    return fallbackResponse(ctx, cache, cacheKey);
   }
 
   const res = await fetch(ensAvatar, {
@@ -50,6 +50,6 @@ export async function handleAvatar(request: IRequest, env: Env, ctx: ExecutionCo
     ctx.waitUntil(cache.put(cacheKey, res.clone()));
     return res;
   } else {
-    return fallbackResponse();
+    return fallbackResponse(ctx, cache, cacheKey);
   }
 }

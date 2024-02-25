@@ -12,9 +12,15 @@ const avatar = `
 `;
 
 // return 404 status but still send the fallback avatar
-export function fallbackResponse() {
-  return new Response(avatar, {
+export function fallbackResponse(ctx: ExecutionContext, cache: Cache, cacheKey: Request) {
+  const res = new Response(avatar, {
     status: 404,
-    headers: { 'Content-Type': 'image/svg+xml' },
+    headers: {
+      'Content-Type': 'image/svg+xml',
+      'Cache-Control': 'public, max-age=600, stale-while-revalidate=3000',
+    },
   });
+
+  ctx.waitUntil(cache.put(cacheKey, res.clone()));
+  return res;
 }
