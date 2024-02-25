@@ -2,7 +2,7 @@ import { IRequest } from 'itty-router';
 import { z } from 'zod';
 
 import { fallbackResponse } from '../lib/avt-fallback';
-import { getPublicClient } from '../lib/utils';
+import { cacheAndCreateResponse, getPublicClient } from '../lib/utils';
 
 const schema = z.object({
   name: z.string(),
@@ -10,7 +10,19 @@ const schema = z.object({
   height: z.coerce.number().optional(),
 });
 
-export async function handleAvatar(request: IRequest, env: Env) {
+export async function handleAvatar(request: IRequest, env: Env, ctx: ExecutionContext) {
+  // Construct the cache key
+  const cacheUrl = new URL(request.url);
+  const cacheKey = new Request(cacheUrl.toString(), request);
+  const cache = await caches.open('avatar');
+
+  // Check whether the value is already available in the cache
+  let response = await cache.match(cacheKey);
+
+  if (response) {
+    return response;
+  }
+
   const params = { ...request.params, ...request.query };
   const safeParse = schema.safeParse(params);
 
@@ -27,10 +39,11 @@ export async function handleAvatar(request: IRequest, env: Env) {
     return fallbackResponse();
   }
 
-  const res = await fetch(ensAvatar, {
+  response = await fetch(ensAvatar, {
     headers: request.headers,
     cf: {
       cacheTtl: 3600,
+      cacheEverything: true,
       image: {
         width: width || height || 256,
         height: height || width || 256,
@@ -39,8 +52,9 @@ export async function handleAvatar(request: IRequest, env: Env) {
     },
   });
 
-  if (res.ok || res.redirected) {
-    return res;
+  if (response.ok || response.redirected) {
+    ctx.waitUntil(cache.put(cacheKey, response.clone()));
+    return response;
   } else {
     return fallbackResponse();
   }

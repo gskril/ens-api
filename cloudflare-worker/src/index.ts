@@ -14,7 +14,7 @@ router
   .get('/', () => Response.json(indexJson))
   .get('/n/:name', (request, env, ctx) => handleName(request, env, ctx))
   .get('/a/:address', (request, env, ctx) => handleAddress(request, env, ctx))
-  .get('/avatar/:name', (request, env) => handleAvatar(request, env))
+  .get('/avatar/:name', (request, env, ctx) => handleAvatar(request, env, ctx))
   .post('/batch/addresses', (request, env, ctx) => handleAddresses(request, env, ctx))
   .post('/batch/names', (request, env, ctx) => handleNames(request, env, ctx))
   .all('*', () => error(404));
