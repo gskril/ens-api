@@ -57,6 +57,8 @@ yarn run dev
 
 ## Deploy to Cloudflare
 
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/gskril/ens-api)
+
 Sign into the Cloudflare CLI
 
 ```bash
