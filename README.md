@@ -1,5 +1,8 @@
 # ENS API
 
+> [!NOTE]  
+> This is meant to be self-hosted. Follow the instructions below to deploy it to your own Cloudflare account.
+
 Cloudflare Worker that provides a simple API for fetching ENS profiles and avatars. Built with [ENSjs](https://www.npmjs.com/package/@ensdomains/ensjs), heavily inspired by [v3xlabs/enstate](https://github.com/v3xlabs/enstate).
 
 By default, all endpoints are cached for 10 minutes, then serve a stale response within the following 50 minutes while refreshing the cache in the background. Adjust these settings [here](src/lib/utils.ts#L65-L82). Avatars are cached for longer in most cases.
