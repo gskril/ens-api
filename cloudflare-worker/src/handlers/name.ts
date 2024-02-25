@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 import {
   cacheAndCreateResponse,
+  checkCache,
   commaSeparatedListSchema,
   parseKeysFromParams,
 } from '../lib/utils';
@@ -15,13 +16,7 @@ const schema = z.object({
 });
 
 export async function handleName(request: IRequest, env: Env, ctx: ExecutionContext) {
-  // Construct the cache key
-  const cacheUrl = new URL(request.url);
-  const cacheKey = new Request(cacheUrl.toString(), request);
-  const cache = await caches.open('name');
-
-  // Check whether the value is already available in the cache
-  let response = await cache.match(cacheKey);
+  const { cache, cacheKey, response } = await checkCache('name', request);
 
   if (response) {
     return response;

@@ -4,6 +4,7 @@ import { Address } from 'viem';
 
 import {
   cacheAndCreateResponse,
+  checkCache,
   commaSeparatedListSchema,
   getPublicClient,
   parseKeysFromParams,
@@ -17,13 +18,7 @@ const schema = z.object({
 });
 
 export async function handleAddress(request: IRequest, env: Env, ctx: ExecutionContext) {
-  // Construct the cache key
-  const cacheUrl = new URL(request.url);
-  const cacheKey = new Request(cacheUrl.toString(), request);
-  const cache = await caches.open('address');
-
-  // Check whether the value is already available in the cache
-  let response = await cache.match(cacheKey);
+  const { cache, cacheKey, response } = await checkCache('address', request);
 
   if (response) {
     return response;

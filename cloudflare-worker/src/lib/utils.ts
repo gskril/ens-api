@@ -1,9 +1,10 @@
 import { addEnsContracts, ensPublicActions } from '@ensdomains/ensjs';
-import { createPublicClient, http } from 'viem';
+import { createPublicClient, http, sha256 } from 'viem';
 import { mainnet } from 'viem/chains';
 import { z } from 'zod';
 
 import { defaultCoinKeys, defaultTextKeys } from './constants';
+import { IRequest } from 'itty-router/Router';
 
 export function getPublicClient(env: Env) {
   return createPublicClient({
@@ -43,6 +44,22 @@ export function parseKeysFromParams({
   const coinKeys = defaultCoinKeys.concat(requestedCoinKeys);
 
   return { textKeys, coinKeys };
+}
+
+export async function checkCache(key: string, request: IRequest, body?: unknown) {
+  const bodyHash = sha256(new TextEncoder().encode(JSON.stringify(body)));
+
+  const cacheUrl = new URL(request.url);
+  cacheUrl.pathname = cacheUrl.pathname + bodyHash;
+
+  // Always use GET method to enable caching
+  const cacheKey = new Request(cacheUrl, { method: 'GET', headers: request.headers });
+  const cache = await caches.open(key);
+
+  // Check whether the value is already available in the cache
+  const response = await cache.match(cacheKey);
+
+  return { cache, cacheKey, response };
 }
 
 export function cacheAndCreateResponse(

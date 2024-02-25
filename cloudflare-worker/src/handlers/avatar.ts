@@ -2,7 +2,7 @@ import { IRequest } from 'itty-router';
 import { z } from 'zod';
 
 import { fallbackResponse } from '../lib/avt-fallback';
-import { cacheAndCreateResponse, getPublicClient } from '../lib/utils';
+import { checkCache, getPublicClient } from '../lib/utils';
 
 const schema = z.object({
   name: z.string(),
@@ -11,13 +11,7 @@ const schema = z.object({
 });
 
 export async function handleAvatar(request: IRequest, env: Env, ctx: ExecutionContext) {
-  // Construct the cache key
-  const cacheUrl = new URL(request.url);
-  const cacheKey = new Request(cacheUrl.toString(), request);
-  const cache = await caches.open('avatar');
-
-  // Check whether the value is already available in the cache
-  let response = await cache.match(cacheKey);
+  const { cache, cacheKey, response } = await checkCache('avatar', request);
 
   if (response) {
     return response;
@@ -39,7 +33,7 @@ export async function handleAvatar(request: IRequest, env: Env, ctx: ExecutionCo
     return fallbackResponse();
   }
 
-  response = await fetch(ensAvatar, {
+  const res = await fetch(ensAvatar, {
     headers: request.headers,
     cf: {
       cacheTtl: 3600,
@@ -52,9 +46,9 @@ export async function handleAvatar(request: IRequest, env: Env, ctx: ExecutionCo
     },
   });
 
-  if (response.ok || response.redirected) {
-    ctx.waitUntil(cache.put(cacheKey, response.clone()));
-    return response;
+  if (res.ok || res.redirected) {
+    ctx.waitUntil(cache.put(cacheKey, res.clone()));
+    return res;
   } else {
     return fallbackResponse();
   }

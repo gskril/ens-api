@@ -2,9 +2,8 @@ import { IRequest } from 'itty-router';
 import { normalize } from 'viem/ens';
 import { z } from 'zod';
 
-import { cacheAndCreateResponse, getPublicClient } from '../../lib/utils';
+import { cacheAndCreateResponse, checkCache, getPublicClient } from '../../lib/utils';
 import { batch, getAddressRecord } from '@ensdomains/ensjs/public';
-import { sha256 } from 'viem/utils';
 
 const schema = z.object({
   names: z
@@ -19,16 +18,7 @@ const schema = z.object({
 
 export async function handleNames(request: IRequest, env: Env, ctx: ExecutionContext) {
   const body = await request.json().catch(() => ({}));
-
-  // Construct the cache key
-  const cacheUrl = new URL(request.url);
-  const bodyHash = sha256(new TextEncoder().encode(JSON.stringify(body)));
-  cacheUrl.pathname = cacheUrl.pathname + bodyHash;
-  const cacheKey = new Request(cacheUrl, { method: 'GET', headers: request.headers }); // Convert to a GET to be able to cache
-  const cache = await caches.open('names');
-
-  // Check whether the value is already available in the cache
-  let response = await cache.match(cacheKey);
+  const { cache, cacheKey, response } = await checkCache('names', request, body);
 
   if (response) {
     return response;
@@ -42,8 +32,6 @@ export async function handleNames(request: IRequest, env: Env, ctx: ExecutionCon
 
   const { names, coinType } = safeSchema.data;
   const client = getPublicClient(env);
-
-  console.log(coinType);
 
   const normalizedNames = names.map((name) => {
     try {

@@ -1,10 +1,10 @@
-import { Address, sha256 } from 'viem';
+import { Address } from 'viem';
 import { batch, getName } from '@ensdomains/ensjs/public';
 import { IRequest } from 'itty-router';
 import { normalize } from 'viem/ens';
 import zod from 'zod';
 
-import { cacheAndCreateResponse, getPublicClient } from '../../lib/utils';
+import { cacheAndCreateResponse, checkCache, getPublicClient } from '../../lib/utils';
 
 const schema = zod.object({
   addresses: zod.array(zod.string().regex(/^0x[a-fA-F0-9]{40}$/)).max(100),
@@ -16,16 +16,7 @@ export async function handleAddresses(
   ctx: ExecutionContext
 ) {
   const body = await request.json().catch(() => ({}));
-
-  // Construct the cache key
-  const cacheUrl = new URL(request.url);
-  const bodyHash = sha256(new TextEncoder().encode(JSON.stringify(body)));
-  cacheUrl.pathname = cacheUrl.pathname + bodyHash;
-  const cacheKey = new Request(cacheUrl, { method: 'GET', headers: request.headers }); // Convert to a GET to be able to cache
-  const cache = await caches.open('addresses');
-
-  // Check whether the value is already available in the cache
-  let response = await cache.match(cacheKey);
+  const { cache, cacheKey, response } = await checkCache('addresses', request, body);
 
   if (response) {
     return response;
