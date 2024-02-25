@@ -1,6 +1,8 @@
 # ENS API
 
-Cloudflare Worker that provides a simple API for fetching ENS profiles and avatars.
+Cloudflare Worker that provides a simple API for fetching ENS profiles and avatars. Built with [ENSjs](https://www.npmjs.com/package/@ensdomains/ensjs), heavily inspired by [v3xlabs/enstate](https://github.com/v3xlabs/enstate).
+
+By default, all endpoints are cached for 10 minutes, then serve a stale response within the following 50 minutes while refreshing the cache in the background. Adjust these settings [here](src/lib/utils.ts#L65-L82). Avatars are cached for longer in most cases.
 
 ## Endpoints:
 
@@ -32,14 +34,13 @@ Clone this repo
 git clone https://github.com/gskril/ens-api.git
 ```
 
-Navigate to the `cloudflare-worker` directory and install dependencies
+Install dependencies
 
 ```bash
-cd cloudflare-worker
 yarn install
 ```
 
-Set your environment variables (ETH RPC)
+Set your environment variables (ETH RPC URL)
 
 ```bash
 cp .dev.vars.example .dev.vars
@@ -74,7 +75,7 @@ echo <VALUE> | npx wrangler secret put ETH_RPC
 In order to enable avatar transformations, you will need to configure Cloudflare in a few ways:
 
 - Under "Images" > "Transformations", navigate to the zone you want to use and enable transformations.
-- Deploy this Worker to your Cloudflare account and set the environment variables as described in [`wrangler.toml`](./wrangler.toml).
+- Deploy this Worker to your Cloudflare account by following the instructions above.
 - Make your Worker accessible from the zone (domain) you enabled in step 1.
   - In the domain's DNS page, create an `A` record that points to `192.0.2.0` with any name you want as a subdomain.
   - Under "Worker Routes", add a route that matches the subdomain you created and points to the Worker you deployed.
