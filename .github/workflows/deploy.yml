@@ -15,3 +15,7 @@ jobs:
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          secrets: |
+            ETH_RPC
+        env:
+          ETH_RPC: ${{ secrets.ETH_RPC }}
