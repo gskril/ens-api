@@ -1,7 +1,11 @@
 import { IRequest } from 'itty-router';
 import { z } from 'zod';
 
-import { commaSeparatedListSchema, parseKeysFromParams } from '../lib/utils';
+import {
+  cacheAndCreateResponse,
+  commaSeparatedListSchema,
+  parseKeysFromParams,
+} from '../lib/utils';
 import { fetchProfile } from '../lib/fetchProfile';
 
 const schema = z.object({
@@ -10,7 +14,19 @@ const schema = z.object({
   coins: commaSeparatedListSchema('number').optional(),
 });
 
-export async function handleName(request: IRequest, env: Env) {
+export async function handleName(request: IRequest, env: Env, ctx: ExecutionContext) {
+  // Construct the cache key
+  const cacheUrl = new URL(request.url);
+  const cacheKey = new Request(cacheUrl.toString(), request);
+  const cache = await caches.open('name');
+
+  // Check whether the value is already available in the cache
+  let response = await cache.match(cacheKey);
+
+  if (response) {
+    return response;
+  }
+
   const safeParse = schema.safeParse({ ...request.params, ...request.query });
 
   if (!safeParse.success) {
@@ -28,5 +44,5 @@ export async function handleName(request: IRequest, env: Env) {
     env,
   });
 
-  return Response.json(profile);
+  return cacheAndCreateResponse(ctx, cache, cacheKey, profile);
 }

@@ -13,8 +13,8 @@
     "wrangler": "^3.5.1"
   },
   "dependencies": {
-    "@ensdomains/ensjs": "^3.4.3",
-    "viem": "1.21.4",
+    "@ensdomains/ensjs": "^3.4.4",
+    "viem": "^1.21.4",
     "zod": "^3.22.4"
   }
 }

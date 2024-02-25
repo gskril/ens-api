@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { Address } from 'viem';
 
 import {
+  cacheAndCreateResponse,
   commaSeparatedListSchema,
   getPublicClient,
   parseKeysFromParams,
@@ -15,7 +16,19 @@ const schema = z.object({
   coins: commaSeparatedListSchema('number').optional(),
 });
 
-export async function handleAddress(request: IRequest, env: Env) {
+export async function handleAddress(request: IRequest, env: Env, ctx: ExecutionContext) {
+  // Construct the cache key
+  const cacheUrl = new URL(request.url);
+  const cacheKey = new Request(cacheUrl.toString(), request);
+  const cache = await caches.open('address');
+
+  // Check whether the value is already available in the cache
+  let response = await cache.match(cacheKey);
+
+  if (response) {
+    return response;
+  }
+
   const safeParse = schema.safeParse({ ...request.params, ...request.query });
 
   if (!safeParse.success) {
@@ -42,5 +55,5 @@ export async function handleAddress(request: IRequest, env: Env) {
     request,
   });
 
-  return Response.json(profile);
+  return cacheAndCreateResponse(ctx, cache, cacheKey, profile);
 }

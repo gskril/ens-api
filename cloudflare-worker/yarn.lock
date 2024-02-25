@@ -49,19 +49,19 @@
   resolved "https://registry.yarnpkg.com/@cloudflare/workers-types/-/workers-types-4.20230814.0.tgz#7aadd4f600b1cf772a26160bd5ea836fa2aa42f6"
   integrity sha512-+jHiGjZg2UpULZSSHmHLqUG45TLg1s+uppSMlGvMn0u/xyFsRX9HX6b8Ydg/oHSp3jfSuPtX05GSvtgRAmrWTg==
 
-"@ensdomains/address-encoder@1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@ensdomains/address-encoder/-/address-encoder-1.0.0.tgz#fef1b1457c3a72ba4572c859798eac7c84ed229a"
-  integrity sha512-Y1yJMq0tquAPklrzFH3vKM1HaNS6RKAOzJpNA3QU8F8oTF4iJlkFEmjCTkPjfplTi7u16z2OXvdNLItR5ZpHug==
+"@ensdomains/address-encoder@1.0.0-rc.3":
+  version "1.0.0-rc.3"
+  resolved "https://registry.yarnpkg.com/@ensdomains/address-encoder/-/address-encoder-1.0.0-rc.3.tgz#78a8081bed834661e7fd21a9c9f67f927100fce5"
+  integrity sha512-8o6zH69rObIqDY4PusEWuN9jvVOct+9jj9AOPO7ifc3ev8nmsly0e8TE1sHkhk0iKFbd3DlSsUnJ+yuRWmdLCQ==
   dependencies:
     "@noble/curves" "^1.2.0"
     "@noble/hashes" "^1.3.2"
     "@scure/base" "^1.1.5"
 
-"@ensdomains/address-encoder@1.0.0-rc.3":
-  version "1.0.0-rc.3"
-  resolved "https://registry.yarnpkg.com/@ensdomains/address-encoder/-/address-encoder-1.0.0-rc.3.tgz#78a8081bed834661e7fd21a9c9f67f927100fce5"
-  integrity sha512-8o6zH69rObIqDY4PusEWuN9jvVOct+9jj9AOPO7ifc3ev8nmsly0e8TE1sHkhk0iKFbd3DlSsUnJ+yuRWmdLCQ==
+"@ensdomains/address-encoder@1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@ensdomains/address-encoder/-/address-encoder-1.1.0.tgz#0765ea1fdb1fd91cc3f4d3d2dd579c83a9b4f016"
+  integrity sha512-kc+VFq4ml6UB/s1TRjwx/QOeGmvbUWkMDps/nLDco40CpU3//Iw8vscQ12wQzmCzn760kkyOt6nNBP2L3nhtAA==
   dependencies:
     "@noble/curves" "^1.2.0"
     "@noble/hashes" "^1.3.2"
@@ -85,13 +85,13 @@
     dns-packet "^5.6.1"
     typescript-logging "^1.0.1"
 
-"@ensdomains/ensjs@^3.4.3":
-  version "3.4.3"
-  resolved "https://registry.yarnpkg.com/@ensdomains/ensjs/-/ensjs-3.4.3.tgz#61f8b6f3b4e87c090154a5adf399defbf0de33bc"
-  integrity sha512-Q8xPwXSqz/N9pkw7pP64S/omow1jqgZJnOKVhbN48biZn/d3w/hFZw2u6EBFPnyU6pY6F5xi+uDnUYiPPONj9w==
+"@ensdomains/ensjs@^3.4.4":
+  version "3.4.4"
+  resolved "https://registry.yarnpkg.com/@ensdomains/ensjs/-/ensjs-3.4.4.tgz#2b0ea3363a659a25f103fb4b28af367e66f77ec7"
+  integrity sha512-x81JQA91Pgs4o4rGbGsE4vt0GUOd+5DK4R0LDXXLAt+q5oQQKThnH41wmwl0DB1KSlknHYPWHCrLtzbRAboAFw==
   dependencies:
     "@adraffy/ens-normalize" "1.9.0"
-    "@ensdomains/address-encoder" "1.0.0"
+    "@ensdomains/address-encoder" "1.1.0"
     "@ensdomains/content-hash" "3.1.0-rc.1"
     "@ensdomains/dnsprovejs" "^0.5.1"
     abitype "^0.8.0"
@@ -1054,7 +1054,7 @@ util-deprecate@^1.0.1:
   resolved "https://registry.yarnpkg.com/util-deprecate/-/util-deprecate-1.0.2.tgz#450d4dc9fa70de732762fbd2d4a28981419a0ccf"
   integrity sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==
 
-viem@1.21.4:
+viem@^1.21.4:
   version "1.21.4"
   resolved "https://registry.yarnpkg.com/viem/-/viem-1.21.4.tgz#883760e9222540a5a7e0339809202b45fe6a842d"
   integrity sha512-BNVYdSaUjeS2zKQgPs+49e5JKocfo60Ib2yiXOWBT6LuVxY1I/6fFX3waEtpXvL1Xn4qu+BVitVtMh9lyThyhQ==

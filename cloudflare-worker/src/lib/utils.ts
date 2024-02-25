@@ -44,3 +44,22 @@ export function parseKeysFromParams({
 
   return { textKeys, coinKeys };
 }
+
+export function cacheAndCreateResponse(
+  ctx: ExecutionContext,
+  cache: Cache,
+  cacheKey: Request,
+  data: any
+) {
+  const response = Response.json(data);
+
+  // Cache the response for 10 minutes. If the same data is requested witin the
+  // next 50 mins, serve the stale response while revalidating in the background
+  response.headers.append(
+    'Cache-Control',
+    'public, max-age=600, stale-while-revalidate=3000'
+  );
+
+  ctx.waitUntil(cache.put(cacheKey, response.clone()));
+  return response;
+}

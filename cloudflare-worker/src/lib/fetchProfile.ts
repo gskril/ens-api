@@ -52,7 +52,7 @@ export async function fetchProfile({
 
   return {
     name,
-    address: coins[60].address,
+    address: coins[60]?.address,
     avatar,
     texts,
     coins,
