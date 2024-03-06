@@ -40,7 +40,7 @@ const indexJson = {
     {
       method: 'GET',
       endpoint: '/avatar/:name',
-      params: ['width', 'height'],
+      params: ['width', 'height', 'fallback'],
     },
     {
       method: 'POST',

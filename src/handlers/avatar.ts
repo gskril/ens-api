@@ -8,6 +8,7 @@ const schema = z.object({
   name: z.string(),
   width: z.coerce.number().optional(),
   height: z.coerce.number().optional(),
+  fallback: z.string().url().optional(),
 });
 
 export async function handleAvatar(request: IRequest, env: Env, ctx: ExecutionContext) {
@@ -24,13 +25,13 @@ export async function handleAvatar(request: IRequest, env: Env, ctx: ExecutionCo
     return Response.json(safeParse.error, { status: 400 });
   }
 
-  const { name, width, height } = safeParse.data;
+  const { name, width, height, fallback } = safeParse.data;
 
   const client = getPublicClient(env);
   const ensAvatar = await client.getEnsAvatar({ name });
 
   if (!ensAvatar) {
-    return fallbackResponse(ctx, cache, cacheKey);
+    return fallbackResponse(ctx, cache, cacheKey, fallback);
   }
 
   // Note: Cloudflare sanitizes SVGs by default so we don't need extra checks here
@@ -52,6 +53,6 @@ export async function handleAvatar(request: IRequest, env: Env, ctx: ExecutionCo
     ctx.waitUntil(cache.put(cacheKey, res.clone()));
     return res;
   } else {
-    return fallbackResponse(ctx, cache, cacheKey);
+    return fallbackResponse(ctx, cache, cacheKey, fallback);
   }
 }

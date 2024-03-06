@@ -21,6 +21,7 @@ By default, all endpoints are cached for 10 minutes, then serve a stale response
   - Params (all optional):
     - `width` - width of the avatar (default: 256)
     - `height` - height of the avatar (default: 256)
+    - `fallback` - image URL to use if the ENS name has no avatar
 - POST `/batch/names` - Resolve a list of addresses from ENS names
   - Body:
     - `names` - array of ENS names
