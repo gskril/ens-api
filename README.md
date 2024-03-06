@@ -68,7 +68,7 @@ npx wrangler login
 Deploy the Worker
 
 ```bash
-yarn run deploy
+yarn && yarn run deploy
 ```
 
 Set your ETH RPC environment variable
