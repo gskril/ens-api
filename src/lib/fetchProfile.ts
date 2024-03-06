@@ -47,7 +47,7 @@ export async function fetchProfile({
     xs: `${baseUrl}/avatar/${name}?width=64`,
     sm: `${baseUrl}/avatar/${name}?width=128`,
     md: `${baseUrl}/avatar/${name}?width=256`,
-    lg: `${baseUrl}/avatar/${name}=width=512`,
+    lg: `${baseUrl}/avatar/${name}?width=512`,
   };
 
   return {
