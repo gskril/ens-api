@@ -32,6 +32,5 @@ export async function fallbackResponse(
     });
   }
 
-  ctx.waitUntil(cache.put(cacheKey, res.clone()));
   return res;
 }

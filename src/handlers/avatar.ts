@@ -15,9 +15,11 @@ export async function handleAvatar(request: IRequest, env: Env, ctx: ExecutionCo
   const { cache, cacheKey, response } = await checkCache('avatar', request);
 
   if (response) {
+    console.log('returning from cache');
     return response;
   }
 
+  console.log('not cached');
   const params = { ...request.params, ...request.query };
   const safeParse = schema.safeParse(params);
 
@@ -26,16 +28,20 @@ export async function handleAvatar(request: IRequest, env: Env, ctx: ExecutionCo
   }
 
   const { name, width, height, fallback } = safeParse.data;
-
   const client = getPublicClient(env);
+
+  // This occasionally/inconsistently returns null even when a name has an avatar (e.g. nick.eth)
+  // This occasionally takes 30+ seconds and times out (e.g. estmcmxci.eth)
   const ensAvatar = await client.getEnsAvatar({
     name,
-    gatewayUrls: { ipfs: 'https://ipfs.punkscape.xyz' },
+    assetGatewayUrls: { ipfs: 'https://ipfs.punkscape.xyz' },
   });
 
   if (!ensAvatar) {
+    console.log('no avatar found');
     return fallbackResponse(ctx, cache, cacheKey, fallback);
   }
+  console.log('avatar', ensAvatar);
 
   // Note: Cloudflare sanitizes SVGs by default so we don't need extra checks here
   // https://developers.cloudflare.com/images/transform-images/#sanitized-svgs
@@ -52,11 +58,12 @@ export async function handleAvatar(request: IRequest, env: Env, ctx: ExecutionCo
     },
   });
 
-  if (res.ok || res.redirected) {
+  // Sometimes OpenSea returns a 304 Not Modified status which is not technically `ok`, but we should still return.
+  if ((res.status >= 200 && res.status < 400) || res.redirected) {
     ctx.waitUntil(cache.put(cacheKey, res.clone()));
     return res;
   } else {
-    console.log('Images res', res.status);
+    console.log({ res: res.status, ok: res.ok });
     return fallbackResponse(ctx, cache, cacheKey, fallback);
   }
 }
