@@ -30,8 +30,7 @@ export async function handleAvatar(request: IRequest, env: Env, ctx: ExecutionCo
   const { name, width, height, fallback } = safeParse.data;
   const client = getPublicClient(env);
 
-  // This occasionally/inconsistently returns null even when a name has an avatar (e.g. nick.eth)
-  // This occasionally takes 30+ seconds and times out (e.g. estmcmxci.eth)
+  // This occasionally/inconsistently returns null even when a name has an avatar
   const ensAvatar = await client.getEnsAvatar({
     name,
     assetGatewayUrls: { ipfs: 'https://ipfs.punkscape.xyz' },
