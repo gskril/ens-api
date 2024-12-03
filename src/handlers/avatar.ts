@@ -28,7 +28,10 @@ export async function handleAvatar(request: IRequest, env: Env, ctx: ExecutionCo
   const { name, width, height, fallback } = safeParse.data;
 
   const client = getPublicClient(env);
-  const ensAvatar = await client.getEnsAvatar({ name });
+  const ensAvatar = await client.getEnsAvatar({
+    name,
+    gatewayUrls: { ipfs: 'https://ipfs.punkscape.xyz' },
+  });
 
   if (!ensAvatar) {
     return fallbackResponse(ctx, cache, cacheKey, fallback);
@@ -53,6 +56,7 @@ export async function handleAvatar(request: IRequest, env: Env, ctx: ExecutionCo
     ctx.waitUntil(cache.put(cacheKey, res.clone()));
     return res;
   } else {
+    console.log('Images res', res.status);
     return fallbackResponse(ctx, cache, cacheKey, fallback);
   }
 }
