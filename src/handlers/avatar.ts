@@ -30,7 +30,8 @@ export async function handleAvatar(request: IRequest, env: Env, ctx: ExecutionCo
   const { name, width, height, fallback } = safeParse.data;
   const client = getPublicClient(env);
 
-  // This occasionally/inconsistently returns null even when a name has an avatar
+  // This occasionally returns null even when a name has an avatar
+  // This occasionally times out when the record is a CAIP-22 or CAIP-29 value
   const ensAvatar = await client.getEnsAvatar({
     name,
     assetGatewayUrls: { ipfs: 'https://ipfs.punkscape.xyz' },
