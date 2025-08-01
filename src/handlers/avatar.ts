@@ -15,8 +15,7 @@ export async function handleAvatar(request: IRequest, env: Env, ctx: ExecutionCo
   const { cache, cacheKey, response } = await checkCache('avatar', request);
 
   if (response) {
-    console.log('returning from cache');
-    return response;
+    return new Response(response.body, response);
   }
 
   console.log('not cached');

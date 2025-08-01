@@ -21,7 +21,7 @@ export async function handleAddress(request: IRequest, env: Env, ctx: ExecutionC
   const { cache, cacheKey, response } = await checkCache('address', request);
 
   if (response) {
-    return response;
+    return new Response(response.body, response);
   }
 
   const safeParse = schema.safeParse({ ...request.params, ...request.query });
