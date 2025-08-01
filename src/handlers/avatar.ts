@@ -58,6 +58,7 @@ export async function handleAvatar(request: IRequest, env: Env, ctx: ExecutionCo
         width: width || height || 256,
         height: height || width || 256,
         fit: 'cover',
+        format: 'webp',
       },
     },
   });
@@ -67,21 +68,6 @@ export async function handleAvatar(request: IRequest, env: Env, ctx: ExecutionCo
     ctx.waitUntil(cache.put(cacheKey, resizedRes.clone()));
     return resizedRes;
   } else {
-    // Cloudfare doesn't like to resize certain images, so we try to fetch the original image if the resize fails
-    try {
-      const resWithoutResize = await fetch(avatarUrl, {
-        cf: {
-          cacheTtl: 3600,
-          cacheEverything: true,
-        },
-      });
-
-      if (resWithoutResize.status >= 200 && resWithoutResize.status < 300) {
-        ctx.waitUntil(cache.put(cacheKey, resWithoutResize.clone()));
-        return resWithoutResize;
-      }
-    } catch {}
-
     console.log({ res: resizedRes.status, ok: resizedRes.ok });
     return fallbackResponse(ctx, cache, cacheKey, fallback);
   }
