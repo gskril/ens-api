@@ -4,7 +4,7 @@ import { mainnet } from 'viem/chains';
 import { z } from 'zod';
 
 import { defaultCoinKeys, defaultTextKeys } from './constants';
-import { IRequest } from 'itty-router/Router';
+import { IRequest } from 'itty-router/types';
 
 export function getPublicClient(env: Env) {
   return createPublicClient({
