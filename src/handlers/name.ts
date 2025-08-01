@@ -19,7 +19,7 @@ export async function handleName(request: IRequest, env: Env, ctx: ExecutionCont
   const { cache, cacheKey, response } = await checkCache('name', request);
 
   if (response) {
-    return response;
+    return new Response(response.body, response);
   }
 
   const safeParse = schema.safeParse({ ...request.params, ...request.query });

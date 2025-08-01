@@ -15,8 +15,7 @@ export async function handleAvatar(request: IRequest, env: Env, ctx: ExecutionCo
   const { cache, cacheKey, response } = await checkCache('avatar', request);
 
   if (response) {
-    console.log('returning from cache');
-    return response;
+    return new Response(response.body, response);
   }
 
   console.log('not cached');
@@ -61,7 +60,7 @@ export async function handleAvatar(request: IRequest, env: Env, ctx: ExecutionCo
   // Sometimes OpenSea returns a 304 Not Modified status which is not technically `ok`, but we should still return.
   if ((res.status >= 200 && res.status < 400) || res.redirected) {
     ctx.waitUntil(cache.put(cacheKey, res.clone()));
-    return res;
+    return new Response(res.body, res);
   } else {
     console.log({ res: res.status, ok: res.ok });
     return fallbackResponse(ctx, cache, cacheKey, fallback);

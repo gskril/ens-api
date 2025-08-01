@@ -19,7 +19,7 @@ export async function handleAddresses(
   const { cache, cacheKey, response } = await checkCache('addresses', request, body);
 
   if (response) {
-    return response;
+    return new Response(response.body, response);
   }
 
   const safeParse = schema.safeParse(body);
