@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 import { fallbackResponse } from '../lib/avt-fallback';
 import { checkCache, getPublicClient } from '../lib/utils';
+import { parseAvatarRecord } from 'viem/ens';
 
 const schema = z.object({
   name: z.string(),
@@ -30,23 +31,30 @@ export async function handleAvatar(request: IRequest, env: Env, ctx: ExecutionCo
   const { name, width, height, fallback } = safeParse.data;
   const client = getPublicClient(env);
 
-  // This occasionally returns null even when a name has an avatar
-  // This occasionally times out when the record is a CAIP-22 or CAIP-29 value
-  const ensAvatar = await client.getEnsAvatar({
+  const textRecord = await client.getEnsText({
     name,
-    assetGatewayUrls: { ipfs: 'https://ipfs.punkscape.xyz' },
+    key: 'avatar',
   });
 
-  if (!ensAvatar) {
+  if (!textRecord) {
     console.log('no avatar found');
     return fallbackResponse(ctx, cache, cacheKey, fallback);
   }
-  console.log('avatar', ensAvatar);
+
+  const avatarUrl = await parseAvatarRecord(client, {
+    record: textRecord,
+    gatewayUrls: { ipfs: 'https://ipfs.punkscape.xyz' },
+  });
+
+  console.log({ textRecord, avatarUrl });
 
   // Note: Cloudflare sanitizes SVGs by default so we don't need extra checks here
   // https://developers.cloudflare.com/images/transform-images/#sanitized-svgs
-  const res = await fetch(ensAvatar, {
-    headers: request.headers,
+  const res = await fetch(avatarUrl, {
+    headers: {
+      ...request.headers,
+      'X-API-KEY': avatarUrl.includes('.seadn.io') ? env.OPENSEA_API_KEY : '',
+    },
     cf: {
       cacheTtl: 3600,
       cacheEverything: true,
