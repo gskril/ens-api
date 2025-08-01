@@ -50,25 +50,39 @@ export async function handleAvatar(request: IRequest, env: Env, ctx: ExecutionCo
 
   // Note: Cloudflare sanitizes SVGs by default so we don't need extra checks here
   // https://developers.cloudflare.com/images/transform-images/#sanitized-svgs
-  const res = await fetch(avatarUrl, {
+  const resizedRes = await fetch(avatarUrl, {
     cf: {
       cacheTtl: 3600,
       cacheEverything: true,
       image: {
         width: width || height || 256,
         height: height || width || 256,
-        // fit: 'cover',
+        fit: 'cover',
       },
     },
   });
 
   // Sometimes OpenSea returns a 304 Not Modified status which is not technically `ok`, but we should still return.
-  if ((res.status >= 200 && res.status < 400) || res.redirected) {
-    ctx.waitUntil(cache.put(cacheKey, res.clone()));
-    return res;
+  if ((resizedRes.status >= 200 && resizedRes.status < 400) || resizedRes.redirected) {
+    ctx.waitUntil(cache.put(cacheKey, resizedRes.clone()));
+    return resizedRes;
   } else {
-    console.log({ res: res.status, ok: res.ok });
-    console.log('failed res', JSON.stringify(res, null, 2));
+    // Cloudfare doesn't like to resize certain images, so we try to fetch the original image if the resize fails
+    try {
+      const resWithoutResize = await fetch(avatarUrl, {
+        cf: {
+          cacheTtl: 3600,
+          cacheEverything: true,
+        },
+      });
+
+      if (resWithoutResize.status >= 200 && resWithoutResize.status < 300) {
+        ctx.waitUntil(cache.put(cacheKey, resWithoutResize.clone()));
+        return resWithoutResize;
+      }
+    } catch {}
+
+    console.log({ res: resizedRes.status, ok: resizedRes.ok });
     return fallbackResponse(ctx, cache, cacheKey, fallback);
   }
 }
