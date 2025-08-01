@@ -49,7 +49,7 @@ export async function handleAvatar(request: IRequest, env: Env, ctx: ExecutionCo
   const imgRes = await fetch(avatarUrl);
   const contentType = imgRes.headers.get('content-type');
 
-  console.log({ textRecord, avatarUrl });
+  console.log({ textRecord, avatarUrl, contentType });
 
   // Note: Cloudflare sanitizes SVGs by default so we don't need extra checks here
   // https://developers.cloudflare.com/images/transform-images/#sanitized-svgs
@@ -76,7 +76,7 @@ export async function handleAvatar(request: IRequest, env: Env, ctx: ExecutionCo
     return res;
   } else {
     console.log({ res: res.status, ok: res.ok });
-    console.log('failed res', res);
+    console.log('failed res', JSON.stringify(res, null, 2));
     return fallbackResponse(ctx, cache, cacheKey, fallback);
   }
 }
