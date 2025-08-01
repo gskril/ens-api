@@ -54,11 +54,11 @@ export async function handleAvatar(request: IRequest, env: Env, ctx: ExecutionCo
     cf: {
       cacheTtl: 3600,
       cacheEverything: true,
-      // image: {
-      //   width: width || height || 256,
-      //   height: height || width || 256,
-      //   fit: 'cover',
-      // },
+      image: {
+        width: width || height || 256,
+        height: height || width || 256,
+        // fit: 'cover',
+      },
     },
   });
 
