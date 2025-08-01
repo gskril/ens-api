@@ -46,19 +46,11 @@ export async function handleAvatar(request: IRequest, env: Env, ctx: ExecutionCo
     gatewayUrls: { ipfs: 'https://ipfs.punkscape.xyz' },
   });
 
-  const imgRes = await fetch(avatarUrl);
-  const contentType = imgRes.headers.get('content-type');
-
-  console.log({ textRecord, avatarUrl, contentType });
+  console.log({ textRecord, avatarUrl });
 
   // Note: Cloudflare sanitizes SVGs by default so we don't need extra checks here
   // https://developers.cloudflare.com/images/transform-images/#sanitized-svgs
   const res = await fetch(avatarUrl, {
-    headers: {
-      ...request.headers,
-      'X-API-KEY': avatarUrl.includes('.seadn.io') ? env.OPENSEA_API_KEY : '',
-      'Content-Type': contentType || 'image/svg+xml',
-    },
     cf: {
       cacheTtl: 3600,
       cacheEverything: true,
