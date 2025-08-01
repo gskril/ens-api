@@ -41,7 +41,7 @@ git clone https://github.com/gskril/ens-api.git
 Install dependencies
 
 ```bash
-yarn install
+bun install
 ```
 
 Set your environment variables (ETH RPC URL)
@@ -53,7 +53,7 @@ cp .dev.vars.example .dev.vars
 Run the development server
 
 ```bash
-yarn run dev
+bun run dev
 ```
 
 ## Deploy to Cloudflare
@@ -69,7 +69,7 @@ npx wrangler login
 Deploy the Worker
 
 ```bash
-yarn && yarn run deploy
+bun && bun run deploy
 ```
 
 Set your ETH RPC environment variable
