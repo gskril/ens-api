@@ -22,9 +22,9 @@ export async function fallbackResponse(
 
   if (fallback) {
     res = await fetch(fallback);
+    res = new Response(res.body, res);
   } else {
     res = new Response(avatar, {
-      status: 404,
       headers: {
         'Content-Type': 'image/svg+xml',
         'Cache-Control': 'public, max-age=600, stale-while-revalidate=3000',
