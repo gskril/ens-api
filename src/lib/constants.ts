@@ -2,15 +2,11 @@
 export const defaultTextKeys = [
   'avatar',
   'description',
-  'display',
   'email',
   'location',
   'url',
   'com.github',
-  'com.linkedin',
   'com.twitter',
-  'io.keybase',
-  'org.telegram',
 ];
 
 // Select keys from ENSIP-9 and popular L2s

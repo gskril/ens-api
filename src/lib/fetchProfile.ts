@@ -56,5 +56,6 @@ export async function fetchProfile({
     avatar,
     texts,
     coins,
+    resolver: profile.resolverAddress,
   };
 }
