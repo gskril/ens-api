@@ -12,9 +12,9 @@
     "wrangler": "^4.27.0"
   },
   "dependencies": {
-    "@ensdomains/ensjs": "^4.0.2",
-    "itty-router": "^5.0.20",
-    "viem": "^2.33.2",
-    "zod": "^4.0.14"
+    "@ensdomains/ensjs": "^4.1.2",
+    "itty-router": "^5.0.22",
+    "viem": "^2.37.12",
+    "zod": "^4.1.11"
   }
 }
