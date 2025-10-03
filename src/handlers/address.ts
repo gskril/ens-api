@@ -1,6 +1,6 @@
 import { IRequest } from 'itty-router';
 import { z } from 'zod';
-import { Address } from 'viem';
+import { Address, toCoinType } from 'viem';
 
 import {
   cacheAndCreateResponse,
@@ -8,6 +8,7 @@ import {
   commaSeparatedListSchema,
   getPublicClient,
   parseKeysFromParams,
+  safeCoinType,
 } from '../lib/utils';
 import { fetchProfile } from '../lib/fetchProfile';
 
@@ -15,6 +16,8 @@ const schema = z.object({
   address: z.string().regex(/^0x[a-fA-F0-9]{40}$/),
   texts: commaSeparatedListSchema('string').optional(),
   coins: commaSeparatedListSchema('number').optional(),
+  // This can be an EVM chain id or cointype for convenience
+  chain: z.coerce.number().optional().default(1),
 });
 
 export async function handleAddress(request: IRequest, env: Env, ctx: ExecutionContext) {
@@ -34,7 +37,8 @@ export async function handleAddress(request: IRequest, env: Env, ctx: ExecutionC
   const address = params.address as Address;
 
   const client = getPublicClient(env);
-  const name = await client.getEnsName({ address });
+  const coinType = safeCoinType(params.chain);
+  const name = await client.getEnsName({ address, coinType });
 
   if (!name) {
     return new Response('No ENS name found for this address', { status: 404 });
@@ -42,10 +46,13 @@ export async function handleAddress(request: IRequest, env: Env, ctx: ExecutionC
 
   const { textKeys, coinKeys } = parseKeysFromParams(params);
 
+  // Assume that if we're getting a L2 reverse record, the dev also wants the forward address for that chain
+  coinKeys.push(Number(coinType));
+
   const profile = await fetchProfile({
     name,
     textKeys,
-    coinKeys,
+    coinKeys: Array.from(new Set(coinKeys)),
     env,
     request,
   });

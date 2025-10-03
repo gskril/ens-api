@@ -1,5 +1,5 @@
 import { addEnsContracts, ensPublicActions } from '@ensdomains/ensjs';
-import { createPublicClient, http, sha256 } from 'viem';
+import { createPublicClient, http, sha256, toCoinType } from 'viem';
 import { mainnet } from 'viem/chains';
 import { z } from 'zod';
 
@@ -60,6 +60,20 @@ export async function checkCache(key: string, request: IRequest, body?: unknown)
   const response = await cache.match(cacheKey);
 
   return { cache, cacheKey, response };
+}
+
+function isEVMCoinType(coinType: number): boolean {
+  return (coinType & 0x80000000) !== 0;
+}
+
+export function safeCoinType(chainOrCoinType: number) {
+  // If the input already has the MSB set (is already a coin type), return as-is
+  if (isEVMCoinType(chainOrCoinType)) {
+    return BigInt(chainOrCoinType);
+  }
+
+  // Otherwise, treat it as a chain ID and convert to coin type
+  return toCoinType(chainOrCoinType);
 }
 
 export function cacheAndCreateResponse(
