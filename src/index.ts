@@ -2,7 +2,7 @@ import { AutoRouter, cors, error } from 'itty-router';
 
 import { handleAddress } from './handlers/address';
 import { handleAddresses } from './handlers/batch/addresses';
-import { handleAvatar } from './handlers/avatar';
+import { handleAvatar, handleAvatarHead } from './handlers/avatar';
 import { handleName } from './handlers/name';
 import { handleNames } from './handlers/batch/names';
 
@@ -18,6 +18,7 @@ router
   .get('/name/:name', handleName)
   .get('/address/:address', handleAddress)
   .get('/avatar/:name', handleAvatar)
+  .head('/avatar/:name', handleAvatarHead)
   .post('/batch/addresses', handleAddresses)
   .post('/batch/names', handleNames)
   .all('*', () => error(404));
@@ -35,7 +36,7 @@ const indexJson = {
       params: ['texts', 'coins'],
     },
     {
-      method: 'GET',
+      method: 'GET, HEAD',
       endpoint: '/avatar/:name',
       params: ['width', 'height', 'fallback'],
     },

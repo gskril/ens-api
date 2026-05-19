@@ -66,3 +66,12 @@ export async function handleAvatar(request: IRequest, env: Env, ctx: ExecutionCo
     return fallbackResponse(ctx, cache, cacheKey, fallback);
   }
 }
+
+export async function handleAvatarHead(
+  request: IRequest,
+  env: Env,
+  ctx: ExecutionContext
+) {
+  const response = await handleAvatar(request, env, ctx);
+  return new Response(null, response);
+}

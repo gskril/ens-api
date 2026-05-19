@@ -18,7 +18,7 @@ By default, all endpoints are cached for 10 minutes, then serve a stale response
     - `texts` - keys of text records to fetch (comma-separated)
     - `coins` - coin types to fetch (comma-separated)
     - `chain` - chain id or coin type to fetch the reverse record for (default: 1)
-- GET `/avatar/:name` - Fetch an avatar for an ENS name
+- GET/HEAD `/avatar/:name` - Fetch an avatar for an ENS name
   - Params (all optional):
     - `width` - width of the avatar (default: 256)
     - `height` - height of the avatar (default: 256)
