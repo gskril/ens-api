@@ -1,7 +1,12 @@
 import { IRequest } from 'itty-router';
 import { z } from 'zod';
 
-import { fallbackResponse } from '../lib/avt-fallback';
+import {
+  cacheAvatarResponse,
+  fallbackResponse,
+  LIVE_AVATAR_CACHE_CONTROL,
+  withCacheControl,
+} from '../lib/avt-fallback';
 import { checkCache, getPublicClient } from '../lib/utils';
 
 const schema = z.object({
@@ -47,7 +52,7 @@ export async function handleAvatar(request: IRequest, env: Env, ctx: ExecutionCo
   const res = await fetch(ensAvatar, {
     headers: request.headers,
     cf: {
-      cacheTtl: 3600,
+      cacheTtl: 86400,
       cacheEverything: true,
       image: {
         width: width || height || 256,
@@ -59,8 +64,8 @@ export async function handleAvatar(request: IRequest, env: Env, ctx: ExecutionCo
 
   // Sometimes OpenSea returns a 304 Not Modified status which is not technically `ok`, but we should still return.
   if ((res.status >= 200 && res.status < 400) || res.redirected) {
-    ctx.waitUntil(cache.put(cacheKey, res.clone()));
-    return new Response(res.body, res);
+    const response = withCacheControl(res, LIVE_AVATAR_CACHE_CONTROL);
+    return cacheAvatarResponse(ctx, cache, cacheKey, response);
   } else {
     console.log({ res: res.status, ok: res.ok });
     return fallbackResponse(ctx, cache, cacheKey, fallback);

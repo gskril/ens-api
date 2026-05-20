@@ -5,7 +5,14 @@
 
 Cloudflare Worker that provides a simple API for fetching ENS profiles and avatars. Built with [ENSjs](https://www.npmjs.com/package/@ensdomains/ensjs), inspired by [v3xlabs/enstate](https://github.com/v3xlabs/enstate).
 
-By default, all endpoints are cached for 10 minutes, then serve a stale response within the following 50 minutes while refreshing the cache in the background. Adjust these settings [here](src/lib/utils.ts#L79-L96). Avatars are cached for longer in most cases.
+By default, profile and batch endpoints are cached for 10 minutes, then serve a stale response within the following 50 minutes while refreshing the cache in the background. Adjust these settings [here](src/lib/utils.ts#L79-L96).
+
+Avatar endpoints use a separate cache policy:
+
+- Live ENS avatars are cached for 24 hours, then serve stale responses for up to 1 week while refreshing in the background.
+- Default and custom fallback avatars are cached for 1 hour, then serve stale responses for up to 24 hours while refreshing in the background.
+- `fallback=none` returns an uncached 404 when no avatar is found.
+- Avatar cache entries vary by the full request URL, so distinct `width`, `height`, and `fallback` params are cached independently.
 
 ## Endpoints:
 
