@@ -38,7 +38,7 @@ export async function handleAvatar(request: IRequest, env: Env, ctx: ExecutionCo
   // This occasionally times out when the record is a CAIP-22 or CAIP-29 value
   const ensAvatar = await client.getEnsAvatar({
     name,
-    assetGatewayUrls: { ipfs: 'https://ipfs.io' },
+    assetGatewayUrls: { ipfs: 'https://ipfs.stupidtech.net' },
   });
 
   if (!ensAvatar) {
