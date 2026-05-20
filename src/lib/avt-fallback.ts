@@ -11,7 +11,6 @@ const avatar = `
   </svg>
 `;
 
-// return 404 status but still send the fallback avatar
 export async function fallbackResponse(
   ctx: ExecutionContext,
   cache: Cache,
@@ -20,7 +19,14 @@ export async function fallbackResponse(
 ) {
   let res: Response;
 
-  if (fallback) {
+  if (fallback === 'none') {
+    res = new Response(null, {
+      status: 404,
+      headers: {
+        'Cache-Control': 'no-store',
+      },
+    });
+  } else if (fallback) {
     res = await fetch(fallback);
     res = new Response(res.body, res);
   } else {

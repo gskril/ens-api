@@ -8,7 +8,7 @@ const schema = z.object({
   name: z.string(),
   width: z.coerce.number().optional(),
   height: z.coerce.number().optional(),
-  fallback: z.string().url().optional(),
+  fallback: z.union([z.literal('none'), z.string().url()]).optional(),
 });
 
 export async function handleAvatar(request: IRequest, env: Env, ctx: ExecutionContext) {
