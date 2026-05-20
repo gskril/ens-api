@@ -17,6 +17,7 @@ COPY package.json bun.lock ./
 RUN bun install --production --frozen-lockfile
 
 COPY src ./src
+COPY assets ./assets
 COPY start.sh ./start.sh
 RUN chmod +x ./start.sh
 

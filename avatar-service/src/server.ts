@@ -1,42 +1,18 @@
-import { createPublicClient, http } from 'viem';
-import { mainnet } from 'viem/chains';
-import { normalize } from 'viem/ens';
+import { normalizeEnsName, resolveEnsAvatar } from './ens';
+import { parseEnvInt } from './env';
+import { fallbackResponse } from './fallback';
+import { transformAvatarImage } from './imgproxy';
+import {
+  jsonResponse,
+  LIVE_AVATAR_CACHE_CONTROL,
+  methodNotAllowed,
+  NO_STORE,
+  withCacheControl,
+  withoutHeadBody,
+} from './http';
 
 const DEFAULT_SIZE = 256;
-const IMGPROXY_ORIGIN = 'http://127.0.0.1:8081';
-const IPFS_GATEWAY = process.env.IPFS_GATEWAY || 'https://ipfs.io';
 const MAX_AVATAR_DIMENSION = parseEnvInt('MAX_AVATAR_DIMENSION', 1024);
-
-const LIVE_AVATAR_CACHE_CONTROL =
-  'public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800';
-const FALLBACK_AVATAR_CACHE_CONTROL =
-  'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400';
-const NO_STORE = 'no-store';
-
-const defaultAvatar = `
-  <svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect width="256" height="256" fill="url(#paint0_linear_1409_2)"/>
-    <defs>
-      <linearGradient id="paint0_linear_1409_2" x1="170.517" y1="286.341" x2="-78.3023" y2="-151.616" gradientUnits="userSpaceOnUse">
-        <stop stop-color="#44BCF0"/>
-        <stop offset="0.378795" stop-color="#7298F8"/>
-        <stop offset="1" stop-color="#A099FF"/>
-      </linearGradient>
-    </defs>
-  </svg>
-`;
-
-const ethRpc = process.env.ETH_RPC;
-
-if (!ethRpc) {
-  console.error('ETH_RPC is required');
-  process.exit(1);
-}
-
-const client = createPublicClient({
-  chain: mainnet,
-  transport: http(ethRpc),
-});
 
 Bun.serve({
   hostname: '0.0.0.0',
@@ -87,10 +63,7 @@ async function handleAvatar(encodedName: string, url: URL) {
   let ensAvatar: string | null;
 
   try {
-    ensAvatar = await client.getEnsAvatar({
-      name: parsed.name,
-      assetGatewayUrls: { ipfs: IPFS_GATEWAY },
-    });
+    ensAvatar = await resolveEnsAvatar(parsed.name);
   } catch (error) {
     console.error('ENS avatar lookup failed', {
       name: parsed.name,
@@ -103,28 +76,21 @@ async function handleAvatar(encodedName: string, url: URL) {
     return fallbackResponse(parsed.fallback);
   }
 
-  const imgproxyUrl = createImgproxyUrl(ensAvatar, parsed.width, parsed.height);
-
   let transformed: Response;
 
   try {
-    transformed = await fetch(imgproxyUrl, {
-      headers: {
-        Accept: 'image/webp',
-      },
-    });
+    const response = await transformAvatarImage(ensAvatar, parsed.width, parsed.height);
+
+    if (!response) {
+      console.error('imgproxy returned unusable response', { name: parsed.name });
+      return fallbackResponse(parsed.fallback);
+    }
+
+    transformed = response;
   } catch (error) {
     console.error('imgproxy request failed', {
       name: parsed.name,
       error: error instanceof Error ? error.message : String(error),
-    });
-    return fallbackResponse(parsed.fallback);
-  }
-
-  if (!isUsableImageResponse(transformed)) {
-    console.error('imgproxy returned unusable response', {
-      name: parsed.name,
-      status: transformed.status,
     });
     return fallbackResponse(parsed.fallback);
   }
@@ -152,7 +118,7 @@ function parseAvatarRequest(encodedName: string, params: URLSearchParams):
   let name: string;
 
   try {
-    name = normalize(rawName);
+    name = normalizeEnsName(rawName);
   } catch {
     return { ok: false, error: 'Invalid ENS name' };
   }
@@ -207,106 +173,6 @@ function parseDimension(value: string | null, name: 'width' | 'height') {
   return { ok: true as const, value: numberValue };
 }
 
-function createImgproxyUrl(sourceUrl: string, width: number, height: number) {
-  const encodedSource = encodeURIComponent(sourceUrl);
-  return `${IMGPROXY_ORIGIN}/insecure/resize:fill:${width}:${height}:1/plain/${encodedSource}@webp`;
-}
-
-async function fallbackResponse(fallback?: string) {
-  if (fallback === 'none') {
-    return new Response(null, {
-      status: 404,
-      headers: responseHeaders({
-        'Cache-Control': NO_STORE,
-      }),
-    });
-  }
-
-  if (fallback) {
-    try {
-      const response = await fetch(fallback);
-      return withCacheControl(response, FALLBACK_AVATAR_CACHE_CONTROL);
-    } catch (error) {
-      console.error('custom fallback request failed', {
-        fallback,
-        error: error instanceof Error ? error.message : String(error),
-      });
-    }
-  }
-
-  return new Response(defaultAvatar, {
-    headers: responseHeaders({
-      'Content-Type': 'image/svg+xml',
-      'Cache-Control': FALLBACK_AVATAR_CACHE_CONTROL,
-    }),
-  });
-}
-
-function withCacheControl(response: Response, cacheControl: string) {
-  const headers = new Headers(response.headers);
-  headers.set('Cache-Control', cacheControl);
-  headers.set('Access-Control-Allow-Origin', '*');
-
-  if (cacheControl === NO_STORE) {
-    headers.delete('ETag');
-    headers.delete('Last-Modified');
-  }
-
-  return new Response(response.body, {
-    status: response.status,
-    statusText: response.statusText,
-    headers,
-  });
-}
-
-function isUsableImageResponse(response: Response) {
-  if (response.status < 200 || response.status >= 400) {
-    return false;
-  }
-
-  const contentType = response.headers.get('Content-Type');
-  return !contentType || contentType.startsWith('image/');
-}
-
-function jsonResponse(body: unknown, status: number, cacheControl: string) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: responseHeaders({
-      'Content-Type': 'application/json',
-      'Cache-Control': cacheControl,
-    }),
-  });
-}
-
-function methodNotAllowed(allow: string) {
-  return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-    status: 405,
-    headers: responseHeaders({
-      'Content-Type': 'application/json',
-      'Cache-Control': NO_STORE,
-      Allow: allow,
-    }),
-  });
-}
-
-function responseHeaders(headers: HeadersInit) {
-  const result = new Headers(headers);
-  result.set('Access-Control-Allow-Origin', '*');
-  return result;
-}
-
-function withoutHeadBody(request: Request, response: Response) {
-  if (request.method !== 'HEAD') {
-    return response;
-  }
-
-  return new Response(null, {
-    status: response.status,
-    statusText: response.statusText,
-    headers: response.headers,
-  });
-}
-
 function isHttpUrl(value: string) {
   try {
     const url = new URL(value);
@@ -314,21 +180,4 @@ function isHttpUrl(value: string) {
   } catch {
     return false;
   }
-}
-
-function parseEnvInt(name: string, fallback: number) {
-  const value = process.env[name];
-
-  if (!value) {
-    return fallback;
-  }
-
-  const numberValue = Number(value);
-
-  if (!Number.isInteger(numberValue) || numberValue <= 0) {
-    console.warn(`${name} must be a positive integer. Using ${fallback}.`);
-    return fallback;
-  }
-
-  return numberValue;
 }
