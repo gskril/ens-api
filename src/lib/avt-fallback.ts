@@ -11,6 +11,28 @@ const avatar = `
   </svg>
 `;
 
+export const LIVE_AVATAR_CACHE_CONTROL =
+  'public, max-age=86400, stale-while-revalidate=604800';
+
+export const FALLBACK_AVATAR_CACHE_CONTROL =
+  'public, max-age=3600, stale-while-revalidate=86400';
+
+export function withCacheControl(response: Response, cacheControl: string) {
+  const res = new Response(response.body, response);
+  res.headers.set('Cache-Control', cacheControl);
+  return res;
+}
+
+export function cacheAvatarResponse(
+  ctx: ExecutionContext,
+  cache: Cache,
+  cacheKey: Request,
+  response: Response
+) {
+  ctx.waitUntil(cache.put(cacheKey, response.clone()));
+  return response;
+}
+
 export async function fallbackResponse(
   ctx: ExecutionContext,
   cache: Cache,
@@ -20,7 +42,7 @@ export async function fallbackResponse(
   let res: Response;
 
   if (fallback === 'none') {
-    res = new Response(null, {
+    return new Response(null, {
       status: 404,
       headers: {
         'Cache-Control': 'no-store',
@@ -28,15 +50,15 @@ export async function fallbackResponse(
     });
   } else if (fallback) {
     res = await fetch(fallback);
-    res = new Response(res.body, res);
+    res = withCacheControl(res, FALLBACK_AVATAR_CACHE_CONTROL);
   } else {
     res = new Response(avatar, {
       headers: {
         'Content-Type': 'image/svg+xml',
-        'Cache-Control': 'public, max-age=600, stale-while-revalidate=3000',
+        'Cache-Control': FALLBACK_AVATAR_CACHE_CONTROL,
       },
     });
   }
 
-  return res;
+  return cacheAvatarResponse(ctx, cache, cacheKey, res);
 }
