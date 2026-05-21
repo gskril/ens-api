@@ -6,11 +6,13 @@ The existing Cloudflare Worker remains unchanged. Deploy this directory as a sep
 
 ## Endpoints
 
-- `GET /healthz`
-- `GET /avatar/:name`
-- `HEAD /avatar/:name`
+- `GET /` - returns `ENS avatar transformer`
+- `GET /:network/avatar/:name`
+- `HEAD /:network/avatar/:name`
 
-`/avatar/:name` accepts:
+`network` must be `mainnet` or `sepolia`.
+
+`/:network/avatar/:name` accepts:
 
 - `width` - output width in pixels. Defaults to `256`.
 - `height` - output height in pixels. Defaults to `width`, or `256` when neither is provided.
@@ -32,10 +34,11 @@ Railway CDN should cache by the full request URL, including query params.
 
 Required:
 
-- `ETH_RPC` - Ethereum mainnet RPC URL.
+- `MAINNET_RPC` - Ethereum mainnet RPC URL.
 
 Optional:
 
+- `SEPOLIA_RPC` - Sepolia RPC URL. Required only for `/sepolia/avatar/:name`.
 - `IPFS_GATEWAY` - defaults to `https://ipfs.io`.
 - `MAX_AVATAR_DIMENSION` - defaults to `1024`.
 - `IMGPROXY_BIND` - defaults to `127.0.0.1:8081`.
@@ -60,19 +63,19 @@ RAILWAY_DOCKERFILE_PATH=avatar-service/Dockerfile
 
 If the service root is `avatar-service/`, Railway can use `Dockerfile` directly.
 
-Set `ETH_RPC`, enable Railway CDN for the public domain, and expose the service over HTTP. Railway provides `PORT`; the container defaults to `3000` for local runs.
+Set `MAINNET_RPC`, enable Railway CDN for the public domain, and expose the service over HTTP. Railway provides `PORT`; the container defaults to `3000` for local runs.
 
 ## Local Docker Smoke Test
 
 ```bash
 docker build -f avatar-service/Dockerfile avatar-service -t ens-avatar-service
-docker run --rm -p 3000:3000 -e ETH_RPC="$ETH_RPC" ens-avatar-service
+docker run --rm -p 3000:3000 -e MAINNET_RPC="$MAINNET_RPC" ens-avatar-service
 ```
 
 Then check:
 
 ```bash
-curl -i http://localhost:3000/healthz
-curl -I 'http://localhost:3000/avatar/vitalik.eth?width=128'
-curl -i 'http://localhost:3000/avatar/does-not-exist-123456789.eth?fallback=none'
+curl -i http://localhost:3000/
+curl -I 'http://localhost:3000/mainnet/avatar/vitalik.eth?width=128'
+curl -i 'http://localhost:3000/mainnet/avatar/does-not-exist-123456789.eth?fallback=none'
 ```

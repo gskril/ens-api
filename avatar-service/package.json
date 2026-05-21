@@ -9,7 +9,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "viem": "2.49.3"
+    "viem": "2.49.3",
+    "zod": "4.4.3"
   },
   "devDependencies": {
     "@types/bun": "latest",
