@@ -6,7 +6,6 @@ The existing Cloudflare Worker remains unchanged. Deploy this directory as a sep
 
 ## Endpoints
 
-- `GET /` - returns `ENS avatar transformer`
 - `GET /:network/avatar/:name`
 - `HEAD /:network/avatar/:name`
 
@@ -75,7 +74,6 @@ docker run --rm -p 3000:3000 -e MAINNET_RPC="$MAINNET_RPC" ens-avatar-service
 Then check:
 
 ```bash
-curl -i http://localhost:3000/
 curl -I 'http://localhost:3000/mainnet/avatar/vitalik.eth?width=128'
 curl -i 'http://localhost:3000/mainnet/avatar/does-not-exist-123456789.eth?fallback=none'
 ```
