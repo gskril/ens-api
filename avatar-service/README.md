@@ -55,7 +55,9 @@ Optional:
 - `SEPOLIA_RPC` - Sepolia RPC URL. Required only for `/sepolia/avatar/:name`.
 - `IPFS_GATEWAY` - defaults to `https://ipfs.io`.
 - `MAX_AVATAR_DIMENSION` - defaults to `1024`.
-- `IMGPROXY_BIND` - defaults to `127.0.0.1:8081`.
+- `IMGPROXY_NETWORK` - defaults to `unix`.
+- `IMGPROXY_BIND` - defaults to `/tmp/imgproxy.sock` when `IMGPROXY_NETWORK=unix`, otherwise `127.0.0.1:8081`.
+- `IMGPROXY_UNIX_SOCKET` - Unix socket path used by the Bun server. Defaults to `IMGPROXY_BIND` when `IMGPROXY_NETWORK=unix`.
 - `IMGPROXY_MAX_SRC_FILE_SIZE` - defaults to `10485760`.
 - `IMGPROXY_MAX_SRC_RESOLUTION` - defaults to `25`.
 - `IMGPROXY_MAX_RESULT_DIMENSION` - defaults to `1024`.
@@ -65,7 +67,7 @@ Optional:
 - `IMGPROXY_ALLOW_LOOPBACK_SOURCE_ADDRESSES` - defaults to `false`.
 - `IMGPROXY_ALLOW_LINK_LOCAL_SOURCE_ADDRESSES` - defaults to `false`.
 
-The Bun server uses imgproxy's `/insecure/` path because imgproxy only listens on loopback inside the container and is not exposed publicly.
+The Bun server uses imgproxy's `/insecure/` path because imgproxy listens on a private Unix socket by default and is not exposed publicly. Set `IMGPROXY_NETWORK=tcp`, `IMGPROXY_BIND=127.0.0.1:8081`, and leave `IMGPROXY_UNIX_SOCKET` unset to use TCP loopback instead.
 
 ## Railway Deploy
 
@@ -82,8 +84,8 @@ Set `MAINNET_RPC`, enable Railway CDN for the public domain, and expose the serv
 ## Local Docker Smoke Test
 
 ```bash
-docker build -f avatar-service/Dockerfile avatar-service -t ens-avatar-service
-docker run --rm -p 3000:3000 -e MAINNET_RPC="$MAINNET_RPC" ens-avatar-service
+bun run build
+bun run dev
 ```
 
 Then check:

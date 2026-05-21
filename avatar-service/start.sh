@@ -2,7 +2,17 @@
 set -euo pipefail
 
 export PORT="${PORT:-3000}"
-export IMGPROXY_BIND="${IMGPROXY_BIND:-127.0.0.1:8081}"
+export IMGPROXY_NETWORK="${IMGPROXY_NETWORK:-unix}"
+
+if [[ "$IMGPROXY_NETWORK" == unix* ]]; then
+  export IMGPROXY_BIND="${IMGPROXY_BIND:-/tmp/imgproxy.sock}"
+  export IMGPROXY_UNIX_SOCKET="${IMGPROXY_UNIX_SOCKET:-$IMGPROXY_BIND}"
+  rm -f "$IMGPROXY_BIND"
+else
+  export IMGPROXY_BIND="${IMGPROXY_BIND:-127.0.0.1:8081}"
+  unset IMGPROXY_UNIX_SOCKET
+fi
+
 export IMGPROXY_MAX_SRC_FILE_SIZE="${IMGPROXY_MAX_SRC_FILE_SIZE:-10485760}"
 export IMGPROXY_MAX_SRC_RESOLUTION="${IMGPROXY_MAX_SRC_RESOLUTION:-25}"
 export IMGPROXY_MAX_RESULT_DIMENSION="${IMGPROXY_MAX_RESULT_DIMENSION:-1024}"
@@ -20,6 +30,9 @@ SERVER_PID=$!
 
 cleanup() {
   kill "$SERVER_PID" "$IMGPROXY_PID" 2>/dev/null || true
+  if [[ "$IMGPROXY_NETWORK" == unix* ]]; then
+    rm -f "$IMGPROXY_BIND"
+  fi
 }
 trap cleanup EXIT INT TERM
 

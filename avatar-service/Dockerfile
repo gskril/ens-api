@@ -22,7 +22,9 @@ COPY start.sh ./start.sh
 RUN chmod +x ./start.sh
 
 ENV PORT=3000
-ENV IMGPROXY_BIND=127.0.0.1:8081
+ENV IMGPROXY_NETWORK=unix
+ENV IMGPROXY_BIND=/tmp/imgproxy.sock
+ENV IMGPROXY_UNIX_SOCKET=/tmp/imgproxy.sock
 ENV IPFS_GATEWAY=https://ipfs.io
 ENV MAX_AVATAR_DIMENSION=1024
 

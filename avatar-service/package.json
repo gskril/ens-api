@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "bun run src/server.ts",
-    "dev": "bun --watch src/server.ts",
+    "build": "docker build -f Dockerfile . -t ens-avatar-service",
+    "dev": "docker run --rm --name ens-avatar-service -p 127.0.0.1:3000:3000 -e MAINNET_RPC=https://evm.stupidtech.net/v1/1 -e SEPOLIA_RPC=https://evm.stupidtech.net/v1/11155111 ens-avatar-service",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
