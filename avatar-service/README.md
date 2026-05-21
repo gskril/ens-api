@@ -29,11 +29,7 @@ The service intentionally does not use an in-memory cache and does not enable im
 
 Railway CDN should cache by the full request URL, including query params.
 
-When this service is fronted by Cloudflare, add a Cache Rule for the service
-hostname. Cloudflare's default cache eligibility is based on URL file
-extensions, not the `Content-Type` header, so extensionless avatar URLs such as
-`/mainnet/avatar/gregskril.eth?width=64` can return `Cf-Cache-Status: DYNAMIC`
-even with the cache headers above.
+When this service is fronted by Cloudflare, add a Cache Rule for the service hostname. Cloudflare's default cache eligibility is based on URL file extensions, not the `Content-Type` header, so extensionless avatar URLs such as `/mainnet/avatar/gregskril.eth?width=64` can return `Cf-Cache-Status: DYNAMIC` even with the cache headers above.
 
 Recommended Cloudflare Cache Rule:
 
@@ -46,11 +42,7 @@ Use these Cloudflare rule settings:
 - Cache eligibility: `Eligible for cache`
 - Browser TTL: `Respect origin TTL`
 
-Leave the other optional cache rule settings unset. This lets Cloudflare use the
-service's `Cache-Control` headers for edge TTLs, browser TTLs, stale revalidation,
-and `no-store` responses. The default cache key includes the query string, which
-is required because `width`, `height`, and `fallback` can change the image
-response.
+Leave the other optional cache rule settings unset. This lets Cloudflare use the service's `Cache-Control` headers for edge TTLs, browser TTLs, stale revalidation, and `no-store` responses. The default cache key includes the query string, which is required because `width`, `height`, and `fallback` can change the image response.
 
 ## Environment
 
