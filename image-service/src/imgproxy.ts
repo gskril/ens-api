@@ -7,6 +7,10 @@ type ImgproxyFetchInit = RequestInit & {
 };
 
 export async function transformAvatarImage(sourceUrl: string, width: number, height: number) {
+  if (sourceUrl.startsWith('data:')) {
+    return decodeDataUriResponse(sourceUrl);
+  }
+
   const init: ImgproxyFetchInit = {
     headers: {
       Accept: 'image/webp',
@@ -24,6 +28,47 @@ export async function transformAvatarImage(sourceUrl: string, width: number, hei
   }
 
   return response;
+}
+
+function decodeDataUriResponse(dataUri: string) {
+  const commaIndex = dataUri.indexOf(',');
+  if (commaIndex === -1) {
+    return null;
+  }
+
+  const meta = dataUri.slice('data:'.length, commaIndex);
+  const payload = dataUri.slice(commaIndex + 1);
+  const isBase64 = meta.endsWith(';base64');
+  const mediaType = (isBase64 ? meta.slice(0, -';base64'.length) : meta) || 'application/octet-stream';
+
+  if (!mediaType.startsWith('image/')) {
+    return null;
+  }
+
+  let bytes: Uint8Array<ArrayBuffer>;
+  try {
+    if (isBase64) {
+      const binary = atob(payload);
+      bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+      }
+    } else {
+      const encoded = new TextEncoder().encode(decodeURIComponent(payload));
+      bytes = new Uint8Array(encoded.byteLength);
+      bytes.set(encoded);
+    }
+  } catch {
+    return null;
+  }
+
+  return new Response(new Blob([bytes], { type: mediaType }), {
+    status: 200,
+    headers: {
+      'Content-Type': mediaType,
+      'Content-Length': String(bytes.byteLength),
+    },
+  });
 }
 
 function createImgproxyUrl(sourceUrl: string, width: number, height: number) {
