@@ -35,7 +35,6 @@ export function withCacheControl(response: Response, cacheControl: string) {
   const headers = new Headers(response.headers);
   headers.set('Cache-Control', cacheControl);
   headers.set('Access-Control-Allow-Origin', '*');
-  headers.set('X-Origin-Generated-At', new Date().toISOString());
 
   if (cacheControl === NO_STORE) {
     headers.delete('ETag');
