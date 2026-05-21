@@ -1,0 +1,19 @@
+{
+  "name": "ens-image-service",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "docker build -f Dockerfile . -t ens-image-service",
+    "dev": "docker run --rm --name ens-image-service -p 127.0.0.1:3000:3000 -e MAINNET_RPC=https://evm.stupidtech.net/v1/1 -e SEPOLIA_RPC=https://evm.stupidtech.net/v1/11155111 ens-image-service",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "viem": "2.49.3",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "5.9.3"
+  }
+}
