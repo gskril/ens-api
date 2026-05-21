@@ -63,6 +63,7 @@ Optional:
 - `IMGPROXY_MAX_RESULT_DIMENSION` - defaults to `1024`.
 - `IMGPROXY_MAX_ANIMATION_FRAMES` - defaults to `1`.
 - `IMGPROXY_SANITIZE_SVG` - defaults to `true`.
+- `IMGPROXY_LOCAL_FILESYSTEM_ROOT` - defaults to `/tmp/imgproxy`. Scratch directory for piping `data:` URI avatars (onchain SVGs) through imgproxy. For best performance and isolation, mount this path as tmpfs (e.g. `--tmpfs /tmp/imgproxy:rw,size=64m` in `docker run`).
 - `IMGPROXY_ALLOW_PRIVATE_SOURCE_ADDRESSES` - defaults to `false`.
 - `IMGPROXY_ALLOW_LOOPBACK_SOURCE_ADDRESSES` - defaults to `false`.
 - `IMGPROXY_ALLOW_LINK_LOCAL_SOURCE_ADDRESSES` - defaults to `false`.

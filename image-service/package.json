@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "docker build -f Dockerfile . -t ens-image-service",
-    "dev": "docker run --rm --name ens-image-service -p 127.0.0.1:3000:3000 -e MAINNET_RPC=https://evm.stupidtech.net/v1/1 -e SEPOLIA_RPC=https://evm.stupidtech.net/v1/11155111 ens-image-service",
+    "dev": "docker run --rm --name ens-image-service --tmpfs /tmp/imgproxy:rw,size=64m -p 127.0.0.1:3000:3000 -e MAINNET_RPC=https://evm.stupidtech.net/v1/1 -e SEPOLIA_RPC=https://evm.stupidtech.net/v1/11155111 ens-image-service",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
