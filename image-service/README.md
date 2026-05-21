@@ -1,6 +1,6 @@
-# ENS Avatar Service
+# ENS Image Service
 
-Self-contained Railway service for resolving ENS avatars with Viem and transforming them through a private local imgproxy process.
+Self-contained Railway service for resolving ENS image endpoints with Viem and transforming them through a private local imgproxy process. It currently supports ENS avatars and can be expanded to support other ENS image types.
 
 The existing Cloudflare Worker remains unchanged. Deploy this directory as a separate Railway service.
 
@@ -74,10 +74,10 @@ The Bun server uses imgproxy's `/insecure/` path because imgproxy listens on a p
 Use this directory as the service root, or set the Railway service variable:
 
 ```text
-RAILWAY_DOCKERFILE_PATH=avatar-service/Dockerfile
+RAILWAY_DOCKERFILE_PATH=image-service/Dockerfile
 ```
 
-If the service root is `avatar-service/`, Railway can use `Dockerfile` directly.
+If the service root is `image-service/`, Railway can use `Dockerfile` directly.
 
 Set `MAINNET_RPC`, enable Railway CDN for the public domain, and expose the service over HTTP. Railway provides `PORT`; the container defaults to `3000` for local runs.
 

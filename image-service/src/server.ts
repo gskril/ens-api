@@ -41,7 +41,7 @@ Bun.serve({
   hostname: '0.0.0.0',
   port: Number(process.env.PORT || '3000'),
   routes: {
-    '/': new Response('ENS avatar transformer', {
+    '/': new Response('ENS image service', {
       headers: {
         'Content-Type': 'text/plain; charset=utf-8',
         'Cache-Control': NO_STORE,
@@ -61,7 +61,7 @@ Bun.serve({
   },
 });
 
-console.log(`ENS avatar service listening on ${process.env.PORT || '3000'}`);
+console.log(`ENS image service listening on ${process.env.PORT || '3000'}`);
 
 async function handleAvatarRoute(request: Request & { params: Record<string, string> }) {
   const parsed = parseAvatarRequest(request.params, new URL(request.url).searchParams);

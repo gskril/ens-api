@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "ens-avatar-service",
+      "name": "ens-image-service",
       "dependencies": {
         "viem": "2.49.3",
         "zod": "4.4.3",
