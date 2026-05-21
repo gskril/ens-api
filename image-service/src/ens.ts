@@ -6,7 +6,7 @@ import { z } from 'zod';
 export const networkSchema = z.enum(['mainnet', 'sepolia']);
 type Network = z.infer<typeof networkSchema>;
 
-const IPFS_GATEWAY = process.env.IPFS_GATEWAY || 'https://ipfs.io';
+const IPFS_GATEWAY = process.env.IPFS_GATEWAY || 'https://dweb.link';
 const mainnetRpc = process.env.MAINNET_RPC;
 const sepoliaRpc = process.env.SEPOLIA_RPC;
 

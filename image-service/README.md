@@ -53,7 +53,7 @@ Required:
 Optional:
 
 - `SEPOLIA_RPC` - Sepolia RPC URL. Required only for `/sepolia/avatar/:name`.
-- `IPFS_GATEWAY` - defaults to `https://ipfs.io`.
+- `IPFS_GATEWAY` - defaults to `https://dweb.link`.
 - `MAX_AVATAR_DIMENSION` - defaults to `1024`.
 - `IMGPROXY_NETWORK` - defaults to `unix`.
 - `IMGPROXY_BIND` - defaults to `/tmp/imgproxy.sock` when `IMGPROXY_NETWORK=unix`, otherwise `127.0.0.1:8081`.
