@@ -19,6 +19,8 @@ The existing Cloudflare Worker remains unchanged. Deploy this directory as a sep
 
 Live ENS avatars are returned as WebP images to keep Railway CDN cache keys deterministic.
 
+Onchain SVG avatars (encoded as `data:image/svg+xml` URIs) are piped through imgproxy via a tmpfs scratch path (`IMGPROXY_LOCAL_FILESYSTEM_ROOT`) and rasterized to WebP. This applies the same SVG sanitization that http-sourced avatars receive (`IMGPROXY_SANITIZE_SVG`) and matches the security model of Cloudflare Image Transformations. The trade-off is that vector fidelity is lost on rasterization — at small dimensions (≤ 256px) this is invisible, but at larger sizes (≥ 1024px) rasterized output may look softer than a native SVG render. If lossless vector output is ever required, an alternative is to swap rasterization for an SVG-only sanitizer such as [`svg-hush`](https://github.com/cloudflare/svg-hush).
+
 ## Caching
 
 The service intentionally does not use an in-memory cache and does not enable imgproxy internal cache. It relies on Railway CDN and HTTP cache headers:
