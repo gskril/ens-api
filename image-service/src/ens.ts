@@ -17,13 +17,21 @@ if (!mainnetRpc) {
 
 const mainnetClient = createPublicClient({
   chain: mainnet,
-  transport: http(mainnetRpc),
+  transport: http(mainnetRpc, {
+    batch: {
+      batchSize: 10_240,
+    },
+  }),
 });
 
 const sepoliaClient = sepoliaRpc
   ? createPublicClient({
       chain: sepolia,
-      transport: http(sepoliaRpc),
+      transport: http(sepoliaRpc, {
+        batch: {
+          batchSize: 10_240,
+        },
+      }),
     })
   : null;
 
