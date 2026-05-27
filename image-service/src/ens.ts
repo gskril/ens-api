@@ -20,6 +20,7 @@ const mainnetClient = createPublicClient({
   transport: http(mainnetRpc, {
     batch: {
       batchSize: 10_240,
+      wait: 30,
     },
   }),
 });
