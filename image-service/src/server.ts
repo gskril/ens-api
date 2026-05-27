@@ -7,7 +7,6 @@ import { transformAvatarImage } from './imgproxy';
 import {
   jsonResponse,
   LIVE_AVATAR_CACHE_CONTROL,
-  methodNotAllowed,
   NO_STORE,
   withCacheControl,
   withoutHeadBody,

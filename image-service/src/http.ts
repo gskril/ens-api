@@ -1,8 +1,13 @@
-export const LIVE_AVATAR_CACHE_CONTROL =
-  'public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800';
-export const FALLBACK_AVATAR_CACHE_CONTROL =
-  'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400';
 export const NO_STORE = 'no-store';
+
+const isDev = process.env.NODE_ENV === 'development';
+
+export const LIVE_AVATAR_CACHE_CONTROL = isDev
+  ? NO_STORE
+  : 'public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800';
+export const FALLBACK_AVATAR_CACHE_CONTROL = isDev
+  ? NO_STORE
+  : 'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400';
 
 export function jsonResponse(body: unknown, status: number, cacheControl: string) {
   return new Response(JSON.stringify(body), {
