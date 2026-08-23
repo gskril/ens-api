@@ -9,7 +9,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "viem": "2.55.15",
+    "viem": "2.55.19",
     "zod": "4.4.3"
   },
   "devDependencies": {
