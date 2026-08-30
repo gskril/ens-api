@@ -16,6 +16,6 @@
     "@ensdomains/ensjs": "4.3.1",
     "itty-router": "5.0.23",
     "viem": "2.55.19",
-    "zod": "4.4.3"
+    "zod": "4.5.1"
   }
 }
