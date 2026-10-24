@@ -4,7 +4,7 @@ FROM ghcr.io/imgproxy/imgproxy:latest-${TARGETARCH} AS imgproxy-package
 USER root
 RUN mkdir -p /dist && imgproxy-build-package deb /dist
 
-FROM oven/bun:1.3.6-slim
+FROM oven/bun:1.4.4-slim
 
 WORKDIR /app
 
